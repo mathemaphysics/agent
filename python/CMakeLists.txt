@@ -1,0 +1,3 @@
+pybind11_add_module(agent_python agent_python.cpp)
+target_link_libraries(agent_python PUBLIC agent)
+set_target_properties(agent_python PROPERTIES OUTPUT_NAME agent)
