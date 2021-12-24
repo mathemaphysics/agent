@@ -1,10 +1,11 @@
 #include "agent/agent.hpp"
-#include "catch2/catch.hpp"
+#include <gtest/gtest.h>
 
 using namespace agent;
 
-TEST_CASE( "add_one", "[adder]" ){
-  REQUIRE(add_one(0) == 1);
-  REQUIRE(add_one(123) == 124);
-  REQUIRE(add_one(-1) == 0);
+TEST(add_one, sample)
+{
+  EXPECT_EQ(add_one(0), 1);
+  EXPECT_EQ(add_one(123), 124);
+  EXPECT_EQ(add_one(-1), 0);
 }

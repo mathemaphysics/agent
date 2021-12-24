@@ -16,6 +16,53 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(BUILD_PYTHON ON CACHE BOOL "Enable building of Python bindings")
 set(BUILD_DOCS ON CACHE BOOL "Enable building of documentation")
 
+include(FetchContent)
+
+FetchContent_Declare(
+    spdlog
+    GIT_REPOSITORY  https://github.com/gabime/spdlog.git
+    GIT_TAG         v1.9.2
+)
+
+FetchContent_Declare(
+    flatbuffers
+    GIT_REPOSITORY  https://github.com/google/flatbuffers.git
+    GIT_TAG         v2.0.0
+)
+
+FetchContent_Declare(
+    poco
+    GIT_REPOSITORY  https://github.com/pocoproject/poco.git
+    GIT_TAG         poco-1.11.0-release
+)
+
+FetchContent_Declare(
+    amqpcpp
+    GIT_REPOSITORY  https://github.com/CopernicaMarketingSoftware/AMQP-CPP.git
+    GIT_TAG         v4.3.14
+)
+
+FetchContent_Declare(
+    jsoncpp
+    GIT_REPOSITORY  https://github.com/open-source-parsers/jsoncpp.git
+    GIT_TAG         1.9.4
+)
+
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY  https://github.com/google/googletest.git
+    GIT_TAG         release-1.11.0
+)
+
+FetchContent_MakeAvailable(amqpcpp)
+FetchContent_MakeAvailable(poco)
+FetchContent_MakeAvailable(flatbuffers)
+FetchContent_MakeAvailable(jsoncpp)
+FetchContent_MakeAvailable(spdlog)
+FetchContent_MakeAvailable(googletest)
+
+FetchContent_GetProperties(flatbuffers)
+include(${flatbuffers_SOURCE_DIR}/CMake/BuildFlatBuffers.cmake)
 # compile the library
 add_subdirectory(src)
 
@@ -26,8 +73,6 @@ add_subdirectory(app)
 # compile the tests
 include(CTest)
 if(BUILD_TESTING)
-  add_subdirectory(ext/Catch2)
-  include(./ext/Catch2/contrib/Catch.cmake)
   add_subdirectory(tests)
 endif()
 

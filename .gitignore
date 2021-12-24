@@ -169,3 +169,7 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Build directories
+build/**
+

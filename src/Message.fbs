@@ -1,0 +1,7 @@
+namespace Agent.Messages;
+
+table Message {
+    height:uint;
+    width:uint;
+    pixels:[byte];
+}
