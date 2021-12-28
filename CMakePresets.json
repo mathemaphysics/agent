@@ -46,7 +46,8 @@
                 "JSONCPP_WITH_POST_BUILD_UNITTEST": "FALSE",
                 "JSONCPP_WITH_PKGCONFIG_SUPPORT": "FALSE",
                 "FETCHCONTENT_QUIET": "FALSE",
-                "GIT_PROGRESS": "TRUE"
+                "GIT_PROGRESS": "TRUE",
+                "BUILD_TESTING": "TRUE"
             }
         }
     ],

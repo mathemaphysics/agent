@@ -1,7 +1,10 @@
-namespace Agent.Messages;
+namespace agent.Messages;
 
 table Message {
+    id:uint;
     height:uint;
     width:uint;
     pixels:[byte];
 }
+
+root_type Message;

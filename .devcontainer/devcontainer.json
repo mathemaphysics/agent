@@ -40,7 +40,9 @@
 		"ms-vsliveshare.vsliveshare-audio",
 		"ms-azuretools.vscode-docker",
 		"isaias.doxygen-pack",
-		"gaborv.flatbuffers"
+		"gaborv.flatbuffers",
+		"hbenl.vscode-test-explorer",
+		"novaturion.cpp-classes-creator"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.

@@ -1,10 +1,10 @@
 #pragma once
 
+#include "IWorker.hpp"
+#include "Message_generated.h"
+
 #include <string>
 #include <thread>
-
-#include "IWorker.hpp"
-#include "IMessage.hpp"
 
 /**
  * @brief agent is the total namespace
@@ -19,14 +19,9 @@ namespace agent
 	class Worker : public IWorker
 	{
 	public:
-		Worker();
-
+		Worker(unsigned int _id);
 		~Worker() = default;
-
-		void operator()();
-
-	private:
-		int workerId = -1;
-		
+		int ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const override;
+		void operator()() override;
 	};
 }

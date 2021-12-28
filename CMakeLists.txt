@@ -16,6 +16,12 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(BUILD_PYTHON ON CACHE BOOL "Enable building of Python bindings")
 set(BUILD_DOCS ON CACHE BOOL "Enable building of documentation")
 
+set(AGENT_FB_BUFFER_SIZE "1024")
+
+configure_file(include/agent/agent_config.hpp.in include/agent/agent_config.hpp)
+
+include_directories(${CMAKE_BINARY_DIR}/include)
+
 include(FetchContent)
 
 FetchContent_Declare(
@@ -92,7 +98,7 @@ add_library(agent::agent ALIAS agent)
 
 # Install targets and configuration
 install(
-  TARGETS agent
+  TARGETS agent spdlog
   EXPORT agent-config
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

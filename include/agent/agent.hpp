@@ -1,5 +1,7 @@
 #pragma once
 
+#include "agent/agent_config.hpp"
+
 namespace agent {
 
 /** @brief A very interesting function!
