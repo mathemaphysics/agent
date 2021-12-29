@@ -20,6 +20,7 @@ namespace agent
 	{
 	public:
 		Worker(unsigned int _id);
+		Worker(unsigned int _id, std::string _name);
 		~Worker() = default;
 		int ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const override;
 		void operator()() override;

@@ -3,12 +3,16 @@
 
 #include <iostream>
 #include <exception>
-#include <tuple>
+#include <utility>
 
 #include <spdlog/spdlog.h>
 
 agent::Worker::Worker(unsigned int _id)
     : IWorker(_id)
+{}
+
+agent::Worker::Worker(unsigned int _id, std::string _name)
+    : IWorker(_id, _name)
 {}
 
 int agent::Worker::ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const
@@ -26,7 +30,7 @@ int agent::Worker::ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size
 
 void agent::Worker::operator()()
 {
-    while (true)
+    while (GetState() != WORKER_QUIT)
     {
         if (!_data.empty())
         {
@@ -41,8 +45,8 @@ void agent::Worker::operator()()
             const auto size = curMsg.second;
             try
             {
-                int result = ProcessMessage(message, size);
-                spdlog::info("Successfully processed message");
+                int msgId = ProcessMessage(message, size);
+                spdlog::info("Successfully processed message {}", msgId);
             }
             catch(const std::exception& e)
             {
