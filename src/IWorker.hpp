@@ -1,10 +1,12 @@
 #pragma once
 
+#include <iostream>
 #include <string>
 #include <atomic>
 #include <thread>
 #include <mutex>
 #include <vector>
+#include <functional>
 
 #include <flatbuffers/flatbuffers.h>
 
@@ -30,6 +32,7 @@ namespace agent
 		{
 			_id = __id;
 			_state.store(WORKER_READY); ///< Sets the default to "ready"
+			_thread = new std::thread(std::ref(*this));
 		}
 
 		/**
@@ -43,13 +46,18 @@ namespace agent
 			_id = __id;
 			_name = __name;
 			_state.store(WORKER_READY);
+			_thread = new std::thread(std::ref(*this));
 		}
 
 		/**
 		 * @brief Destroy the IWorker object
 		 * 
 		 */
-		virtual ~IWorker() = default;
+		virtual ~IWorker()
+		{
+			_thread->join();
+			delete _thread;
+		}
 		
 		/**
 		 * @brief Get the ID of the worker
@@ -132,6 +140,7 @@ namespace agent
 	protected:
 		std::vector<std::pair<void*, flatbuffers::uoffset_t>> _data; ///< Queue of messages
 		std::mutex _data_lock; ///< Mutex lock for the \c _data queue
+		std::thread* _thread; ///< Thread object storing the running operator()
 
 	private:
 		unsigned int _id; ///< Unique ID of the worker
