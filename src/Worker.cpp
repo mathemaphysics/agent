@@ -8,14 +8,14 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-agent::Worker::Worker(unsigned int _id)
-    : IWorker(_id)
+agent::Worker::Worker(unsigned int _id, bool _start)
+    : IWorker(_id, _start)
 {
     _logger = spdlog::stdout_color_mt(GetName());
 }
 
-agent::Worker::Worker(unsigned int _id, std::string _name)
-    : IWorker(_id, _name)
+agent::Worker::Worker(unsigned int _id, std::string _name, bool _start)
+    : IWorker(_id, _name, _start)
 {
     _logger = spdlog::stdout_color_mt(GetName());
 }

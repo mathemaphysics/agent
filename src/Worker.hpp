@@ -22,8 +22,8 @@ namespace agent
 	class Worker : public IWorker
 	{
 	public:
-		Worker(unsigned int _id);
-		Worker(unsigned int _id, std::string _name);
+		Worker(unsigned int _id, bool _start = true);
+		Worker(unsigned int _id, std::string _name, bool _start = true);
 		~Worker();
 		int ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const override;
 		void operator()() override;

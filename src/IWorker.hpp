@@ -14,6 +14,7 @@ namespace agent
 {
 	typedef enum {
 		WORKER_READY,
+		WORKER_RUNNING,
 		WORKER_QUIT
 	} WorkerState;
 
@@ -28,11 +29,14 @@ namespace agent
 		 * 
 		 * @param __id The ID number for this worker
 		 */
-		IWorker(unsigned int __id)
+		IWorker(unsigned int __id, bool _start = true)
 		{
 			_id = __id;
 			_state.store(WORKER_READY); ///< Sets the default to "ready"
-			_thread = new std::thread(std::ref(*this));
+
+			// Default is to start the thread immediately
+			if (_start)
+				Run();
 		}
 
 		/**
@@ -41,12 +45,15 @@ namespace agent
 		 * @param __id Desired worker ID
 		 * @param __name Desired worker name
 		 */
-		IWorker(unsigned int __id, std::string __name)
+		IWorker(unsigned int __id, std::string __name, bool _start = true)
 		{
 			_id = __id;
 			_name = __name;
 			_state.store(WORKER_READY);
-			_thread = new std::thread(std::ref(*this));
+
+			// Default is to start the thread immediately
+			if (_start)
+				Run();
 		}
 
 		/**
@@ -58,7 +65,19 @@ namespace agent
 			_thread->join();
 			delete _thread;
 		}
-		
+
+		/**
+		 * @brief Starts the worker thread itself
+		 * 
+		 * This function exists for the case that you might want to inherit \c
+		 * IWorker and do more setup of the object before starting the thread
+		 */
+		void Run()
+		{
+			_thread = new std::thread(std::ref(*this));
+			_state.store(WORKER_RUNNING);
+		}
+
 		/**
 		 * @brief Get the ID of the worker
 		 * 
