@@ -17,6 +17,8 @@ set(BUILD_PYTHON ON CACHE BOOL "Enable building of Python bindings")
 set(BUILD_DOCS ON CACHE BOOL "Enable building of documentation")
 
 set(AGENT_FB_BUFFER_SIZE "1024")
+set(AGENT_CONN_BUFFER_SIZE "8*4096")
+set(AGENT_CONN_TEMP_BUFFER_SIZE "8*4096")
 
 configure_file(include/agent/agent_config.hpp.in include/agent/agent_config.hpp)
 
@@ -67,11 +69,14 @@ FetchContent_MakeAvailable(jsoncpp)
 FetchContent_MakeAvailable(spdlog)
 FetchContent_MakeAvailable(googletest)
 
+FetchContent_GetProperties(amqpcpp)
+set(AMQPCPP_INCLUDE_DIR ${amqpcpp_SOURCE_DIR}/include)
+
 FetchContent_GetProperties(flatbuffers)
 include(${flatbuffers_SOURCE_DIR}/CMake/BuildFlatBuffers.cmake)
+
 # compile the library
 add_subdirectory(src)
-
 
 # compile the application
 add_subdirectory(app)
