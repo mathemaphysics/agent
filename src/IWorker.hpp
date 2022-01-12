@@ -62,8 +62,11 @@ namespace agent
 		 */
 		virtual ~IWorker()
 		{
-			_thread->join();
-			delete _thread;
+			if (_thread != nullptr && _thread->joinable())
+			{
+				_thread->join();
+				delete _thread;
+			}
 		}
 
 		/**
