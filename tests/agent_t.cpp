@@ -11,12 +11,12 @@
 
 using namespace agent;
 
-class AgentWorkerTest : public ::testing::Test
+class WorkerTest : public ::testing::Test
 {
 protected:
   void SetUp() override
   {
-    worker = new Worker(0, "AgentWorkerTest");
+    worker = new Worker(0, std::string("WorkerTest"));
   }
 
   void TearDown() override
@@ -27,7 +27,21 @@ protected:
   Worker* worker;
 };
 
-TEST_F(AgentWorkerTest, CreateWorker)
+class ConnectionBufferTest : public ::testing::Test
+{
+protected:
+  void SetUp() override
+  {
+
+  }
+
+  void TearDown() override
+  {
+    
+  }
+};
+
+TEST_F(WorkerTest, CreateWorker)
 {
   flatbuffers::FlatBufferBuilder builder(AGENT_FB_BUFFER_SIZE);
   auto pixels = builder.CreateVector(
