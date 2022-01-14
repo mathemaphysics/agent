@@ -18,7 +18,6 @@ agent::ConnectionHandler::ConnectionHandler(unsigned int _id)
       _tmpbuffer(AGENT_CONN_TEMP_BUFFER_SIZE),
       _outbuffer(AGENT_CONN_BUFFER_SIZE),
       _address(Poco::Net::SocketAddress("localhost", 5672)),
-      _socket(),
       _logger(nullptr), // Default no logger
       IWorker(_id, false)
 {
@@ -48,7 +47,6 @@ agent::ConnectionHandler::ConnectionHandler(
       _tmpbuffer(AGENT_CONN_TEMP_BUFFER_SIZE),
       _outbuffer(AGENT_CONN_BUFFER_SIZE),
       _address(Poco::Net::SocketAddress(_host, _port)),
-      _socket(),
       _logger(spdlog::stdout_color_mt(_name)),
       IWorker(_id, _name, false)
 {
