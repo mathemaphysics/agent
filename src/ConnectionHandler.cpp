@@ -62,6 +62,14 @@ agent::ConnectionHandler::ConnectionHandler(
   Run();
 }
 
+agent::ConnectionHandler::~ConnectionHandler()
+{
+  _connection->close();
+  _socket.close();
+
+  delete _connection;
+}
+
 void agent::ConnectionHandler::onProperties(AMQP::Connection *__connection, const AMQP::Table &_server, AMQP::Table &_client)
 {
   if (_connection == nullptr)
