@@ -1,5 +1,6 @@
 #include "agent/agent.hpp"
 #include "Worker.hpp"
+#include "ConnectionHandler.hpp"
 #include "Message_generated.h"
 
 #include <thread>
@@ -27,18 +28,20 @@ protected:
   Worker* worker;
 };
 
-class ConnectionBufferTest : public ::testing::Test
+class ConnectionHandlerTest : public ::testing::Test
 {
 protected:
   void SetUp() override
   {
-
+    handler = new ConnectionHandler(0);
   }
 
   void TearDown() override
   {
     
   }
+
+  ConnectionHandler* handler;
 };
 
 TEST_F(WorkerTest, CreateWorker)
