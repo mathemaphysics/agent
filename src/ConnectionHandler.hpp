@@ -27,7 +27,14 @@ namespace agent
 		 * @param _logname Name to give the logger
 		 */
 		ConnectionHandler(unsigned int __id, const std::string& _host, std::uint16_t _port, const std::string& _name);
-		~ConnectionHandler() = default;
+
+		/**
+		 * @brief Destroy the Connection Handler object
+		 * 
+		 * Not default because we need to shut off the \c AMQP::Connection close
+		 * the \c StreamSocket and delete the pointer to \c _connection
+		 */
+		~ConnectionHandler();
 
 		/**
 		 * @brief Callback for the properties action from AMQP server
