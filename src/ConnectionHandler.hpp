@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Buffer.hpp"
+#include "IWorker.hpp"
 
 #include <amqpcpp.h>
 #include <Poco/Net/StreamSocket.h>
@@ -12,10 +13,10 @@
 
 namespace agent
 {
-	class ConnectionHandler : public AMQP::ConnectionHandler
+	class ConnectionHandler : public AMQP::ConnectionHandler, public IWorker
 	{
 	public:
-		ConnectionHandler();
+		ConnectionHandler(unsigned int __id);
 
 		/**
 		 * @brief Construct a new Connection Handler object
@@ -25,7 +26,7 @@ namespace agent
 		 * @param _name Client name to assign the consumer
 		 * @param _logname Name to give the logger
 		 */
-		ConnectionHandler(const std::string& _host, std::uint16_t _port, const std::string& _name);
+		ConnectionHandler(unsigned int __id, const std::string& _host, std::uint16_t _port, const std::string& _name);
 		~ConnectionHandler() = default;
 
 		/**
@@ -88,7 +89,7 @@ namespace agent
 		 * @brief Function which run the loop
 		 * 
 		 */
-		void operator()();
+		void operator()() override;
 
 		/**
 		 * @brief Sets the quit state to kill the loop
@@ -102,6 +103,7 @@ namespace agent
 		bool _quit;
 		bool _connected;
 		Poco::Net::StreamSocket _socket;
+		const Poco::Net::SocketAddress _address;
 		AMQP::Connection* _connection;
 		Buffer _inpbuffer;
 		Buffer _outbuffer;

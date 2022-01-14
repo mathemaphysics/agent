@@ -1,5 +1,6 @@
 #include "agent/agent.hpp"
 #include "ConnectionHandler.hpp"
+#include "IWorker.hpp"
 
 #include <vector>
 #include <cstdint>
@@ -8,19 +9,33 @@
 #include <amqpcpp.h>
 #include <Poco/Net/StreamSocket.h>
 
-agent::ConnectionHandler::ConnectionHandler()
+agent::ConnectionHandler::ConnectionHandler(unsigned int _id)
     : _client("ConnectionHandler"), // Default client name
       _quit(false),
       _connected(false),
-      _socket(Poco::Net::SocketAddress("localhost", 5672)),
       _connection(nullptr),
       _inpbuffer(AGENT_CONN_BUFFER_SIZE),
       _tmpbuffer(AGENT_CONN_TEMP_BUFFER_SIZE),
       _outbuffer(AGENT_CONN_BUFFER_SIZE),
-      _logger(nullptr) // Default no logger
-{}
+      _address(Poco::Net::SocketAddress("localhost", 5672)),
+      _socket(),
+      _logger(nullptr), // Default no logger
+      IWorker(_id, false)
+{
+  // Just announce the creation of the client; can turn this off via log level
+  if (_logger != nullptr)
+    _logger->info("Client {} created", _client);
+
+  // Set up the AMQP::Connection here and then Run()
+  _socket.connect(_address);
+  _socket.setKeepAlive(true);
+
+  // Now you can run since the operator() needs connected first
+  Run();
+}
 
 agent::ConnectionHandler::ConnectionHandler(
+    unsigned int _id,
     const std::string& _host,
     std::uint16_t _port,
     const std::string& _name
@@ -28,16 +43,25 @@ agent::ConnectionHandler::ConnectionHandler(
     : _client(_name),
       _quit(false),
       _connected(false),
-      _socket(Poco::Net::SocketAddress(_host, _port)),
       _connection(nullptr),
       _inpbuffer(AGENT_CONN_BUFFER_SIZE),
       _tmpbuffer(AGENT_CONN_TEMP_BUFFER_SIZE),
       _outbuffer(AGENT_CONN_BUFFER_SIZE),
-      _logger(spdlog::stdout_color_mt(_name))
+      _address(Poco::Net::SocketAddress(_host, _port)),
+      _socket(),
+      _logger(spdlog::stdout_color_mt(_name)),
+      IWorker(_id, _name, false)
 {
   // Just announce the creation of the client; can turn this off via log level
   if (_logger != nullptr)
     _logger->info("Client {} created", _client);
+
+  // Set up the AMQP::Connection here and then Run()
+  _socket.connect(_address);
+  _socket.setKeepAlive(true);
+
+  // Now you can run since the operator() needs connected first
+  Run();
 }
 
 void agent::ConnectionHandler::onProperties(AMQP::Connection *__connection, const AMQP::Table &_server, AMQP::Table &_client)
