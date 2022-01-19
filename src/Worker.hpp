@@ -28,7 +28,7 @@ namespace agent
 		 * @param _id ID to assign to this \c Worker
 		 * @param _start Start thread immediately if true, else not
 		 */
-		Worker(unsigned int _id, bool _start = true);
+		Worker(unsigned int _id, bool _start = true, unsigned int _nthread = 1);
 
 		/**
 		 * @brief Construct a new Worker object
@@ -37,7 +37,7 @@ namespace agent
 		 * @param _name Name to assign the \c Worker
 		 * @param _start Start thread immediately if true, else not
 		 */
-		Worker(unsigned int _id, std::string _name, bool _start = true);
+		Worker(unsigned int _id, std::string _name, bool _start = true, unsigned int _nthread = 1);
 		~Worker();
 
 		/**

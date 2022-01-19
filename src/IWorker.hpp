@@ -29,14 +29,14 @@ namespace agent
 		 * 
 		 * @param __id The ID number for this worker
 		 */
-		IWorker(unsigned int __id, bool _start = true)
+		IWorker(unsigned int __id, bool _start = true, unsigned int _nthread = 1)
 		{
 			_id = __id;
 			_state.store(WORKER_READY); ///< Sets the default to "ready"
 
 			// Default is to start the thread immediately
 			if (_start)
-				Run();
+				Run(_nthread);
 		}
 
 		/**
@@ -45,7 +45,7 @@ namespace agent
 		 * @param __id Desired worker ID
 		 * @param __name Desired worker name
 		 */
-		IWorker(unsigned int __id, std::string __name, bool _start = true)
+		IWorker(unsigned int __id, std::string __name, bool _start = true, unsigned int _nthread = 1)
 		{
 			_id = __id;
 			_name = __name;
@@ -53,7 +53,7 @@ namespace agent
 
 			// Default is to start the thread immediately
 			if (_start)
-				Run();
+				Run(_nthread);
 		}
 
 		/**
@@ -62,10 +62,10 @@ namespace agent
 		 */
 		virtual ~IWorker()
 		{
-			if (_thread != nullptr && _thread->joinable())
+			for (auto _thr: _threads)
 			{
-				_thread->join();
-				delete _thread;
+				if (_thr != nullptr && _thr->joinable())
+					_thr->join();
 			}
 		}
 
@@ -75,10 +75,14 @@ namespace agent
 		 * This function exists for the case that you might want to inherit \c
 		 * IWorker and do more setup of the object before starting the thread
 		 */
-		void Run()
+		void Run(unsigned int _nthread = 1)
 		{
-			_thread = new std::thread(std::ref(*this));
-			_state.store(WORKER_RUNNING);
+			for (unsigned int i = 0; i < _nthread; i++)
+			{
+				_threads.push_back(new std::thread(std::ref(*this)));
+				std::cout << "Started thread " << i << std::endl;
+				_state.store(WORKER_RUNNING);
+			}
 		}
 
 		/**
@@ -162,11 +166,12 @@ namespace agent
 	protected:
 		std::vector<std::pair<void*, flatbuffers::uoffset_t>> _data; ///< Queue of messages
 		std::mutex _data_lock; ///< Mutex lock for the \c _data queue
-		std::thread* _thread; ///< Thread object storing the running operator()
+		std::vector<std::thread*> _threads; ///< TODO: Finish updating this to run multiple
 
 	private:
 		unsigned int _id; ///< Unique ID of the worker
 		std::string _name; ///< Name assigned to the worker
+		std::atomic<int> _nrunning; ///< Contains the number of running threads
 		std::atomic<WorkerState> _state; ///< State of the worker; 0 -> Ready
 	};
 }

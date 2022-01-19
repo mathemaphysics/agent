@@ -17,7 +17,7 @@ class WorkerTest : public ::testing::Test
 protected:
   void SetUp() override
   {
-    worker = new Worker(0, std::string("WorkerTest"));
+    worker = new Worker(0, std::string("WorkerTest"), 1);
   }
 
   void TearDown() override
@@ -33,7 +33,7 @@ class ConnectionHandlerTest : public ::testing::Test
 protected:
   void SetUp() override
   {
-    handler = new ConnectionHandler(0);
+    //handler = new ConnectionHandler(0);
   }
 
   void TearDown() override

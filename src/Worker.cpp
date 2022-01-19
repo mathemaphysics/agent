@@ -4,18 +4,20 @@
 #include <iostream>
 #include <exception>
 #include <utility>
+#include <string>
+#include <sstream>
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-agent::Worker::Worker(unsigned int _id, bool _start)
-    : IWorker(_id, _start)
+agent::Worker::Worker(unsigned int _id, bool _start, unsigned int _nthread)
+    : IWorker(_id, _start, _nthread)
 {
     _logger = spdlog::stdout_color_mt(GetName());
 }
 
-agent::Worker::Worker(unsigned int _id, std::string _name, bool _start)
-    : IWorker(_id, _name, _start)
+agent::Worker::Worker(unsigned int _id, std::string _name, bool _start, unsigned int _nthread)
+    : IWorker(_id, _name, _start, _nthread)
 {
     _logger = spdlog::stdout_color_mt(GetName());
 }
@@ -36,10 +38,13 @@ int agent::Worker::ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size
     int height = message->height();
     auto pixels = message->pixels()->Data();
 
+    const std::thread::id tid = std::this_thread::get_id();
+    auto ssTid = std::ostringstream();
+    ssTid << tid;
     if (_logger != nullptr)
-        _logger->info("Received message: id: {} width: {} height: {}", id, width, height);
+        _logger->info("[{}] Received message: id: {} width: {} height: {}", ssTid.str(), id, width, height);
     else
-        std::cout << "Received message: id: " << id << " width: " << width << " height: " << height << std::endl;
+        std::cout << "[" << std::this_thread::get_id() << "]" << "Received message: id: " << id << " width: " << width << " height: " << height << std::endl;
 
     return id;
 }
