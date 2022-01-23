@@ -55,10 +55,18 @@ namespace agent
 		 */
 		virtual ~IWorker()
 		{
-			// Wait for threads to finish
-			for (auto thr = _threads.begin(); thr != _threads.end(); ++thr)
-				if (thr->joinable())
-					thr->join();
+			// Wait for threads to join
+			std::for_each(
+				_threads.begin(),
+				_threads.end(),
+				[](std::thread &thr){
+					if (thr.joinable())
+						thr.join();
+				}
+			);
+
+			// Clear threads out because we're done
+			_threads.clear();
 
 			// Just to be pedantic
 			_state.store(WORKER_READY);
@@ -85,11 +93,19 @@ namespace agent
 		{
 			// Tell threads to quit
 			SetQuit();
+			
+			// Wait for threads to join
+			std::for_each(
+				_threads.begin(),
+				_threads.end(),
+				[](std::thread &thr){
+					if (thr.joinable())
+						thr.join();
+				}
+			);
 
-			// Wait until they join
-			for (auto thr = _threads.begin(); thr != _threads.end(); ++thr)
-				if (thr->joinable())
-					thr->join();
+			// Clear threads out because we're done
+			_threads.clear();
 
 			// Threads stopped; ready for another run
 			_state.store(WORKER_READY);

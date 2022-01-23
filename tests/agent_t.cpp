@@ -17,7 +17,7 @@ class WorkerTest : public ::testing::Test
 protected:
   void SetUp() override
   {
-    worker = new Worker(0, std::string("WorkerTest"));
+    worker = new Worker(0, "WorkerTest");
     worker->Run(3);
   }
 
@@ -85,9 +85,23 @@ TEST_F(WorkerTest, CreateWorker)
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
   // Exit the thread
+  //worker->SetQuit();
+  worker->Stop();
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  worker->Run();
+
+  // Add the item for the worker to process
+  for (int i = 0; i < 4; i++)
+  {
+    worker->AddMessage(buffer1, size);
+    worker->AddMessage(buffer2, size);
+    worker->AddMessage(buffer3, size);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  }
+
+  //worker->Stop();
   worker->SetQuit();
 
-  //EXPECT_EQ(worker->ProcessMessage(buffer, size), 0);
   EXPECT_EQ(1, 1);
 }
 
