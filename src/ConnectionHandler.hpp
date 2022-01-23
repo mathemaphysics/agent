@@ -93,6 +93,15 @@ namespace agent
 		void onClosed(AMQP::Connection* _connection) override;
 
 		/**
+		 * @brief Overridden function which won't be called
+		 * 
+		 * @param _msg N/A
+		 * @param _size N/A
+		 * @return int N/A
+		 */
+		int ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const override;
+
+		/**
 		 * @brief Function which run the loop
 		 * 
 		 */

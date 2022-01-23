@@ -19,7 +19,7 @@ agent::ConnectionHandler::ConnectionHandler(unsigned int _id)
       _outbuffer(AGENT_CONN_BUFFER_SIZE),
       _address(Poco::Net::SocketAddress("localhost", 5672)),
       _logger(nullptr), // Default no logger
-      IWorker(_id, false)
+      IWorker(_id)
 {
   // Just announce the creation of the client; can turn this off via log level
   if (_logger != nullptr)
@@ -48,7 +48,7 @@ agent::ConnectionHandler::ConnectionHandler(
       _outbuffer(AGENT_CONN_BUFFER_SIZE),
       _address(Poco::Net::SocketAddress(_host, _port)),
       _logger(spdlog::stdout_color_mt(_name)),
-      IWorker(_id, _name, false)
+      IWorker(_id, _name)
 {
   // Just announce the creation of the client; can turn this off via log level
   if (_logger != nullptr)
@@ -152,6 +152,11 @@ void agent::ConnectionHandler::onClosed(AMQP::Connection *__connection)
 
   // Exit the loop
   quit();
+}
+
+int agent::ConnectionHandler::ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const
+{
+  return 0;
 }
 
 void agent::ConnectionHandler::operator()()

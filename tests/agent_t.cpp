@@ -18,6 +18,7 @@ protected:
   void SetUp() override
   {
     worker = new Worker(0, std::string("WorkerTest"));
+    worker->Run(3);
   }
 
   void TearDown() override
@@ -54,15 +55,29 @@ TEST_F(WorkerTest, CreateWorker)
         4, 0, 1 }
     }
   );
-  auto message = Messages::CreateMessage(builder, 0, 3, 3, pixels);
-  builder.Finish(message);
-  auto buffer = builder.GetBufferPointer();
+
+  // Build message 1
+  auto message1 = Messages::CreateMessage(builder, 0, 3, 3, pixels);
+  builder.Finish(message1);
+  auto buffer1 = builder.GetBufferPointer();
   auto size = builder.GetSize();
+
+  // Build message 2
+  auto message2 = Messages::CreateMessage(builder, 1, 3, 3, pixels);
+  builder.Finish(message2);
+  auto buffer2 = builder.GetBufferPointer();
+
+  // Build message 3
+  auto message3 = Messages::CreateMessage(builder, 2, 3, 3, pixels);
+  builder.Finish(message3);
+  auto buffer3 = builder.GetBufferPointer();
 
   // Add the item for the worker to process
   for (int i = 0; i < 4; i++)
   {
-    worker->AddMessage(buffer, size);
+    worker->AddMessage(buffer1, size);
+    worker->AddMessage(buffer2, size);
+    worker->AddMessage(buffer3, size);
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 

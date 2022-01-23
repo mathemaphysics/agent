@@ -6,6 +6,7 @@
 #include <thread>
 #include <mutex>
 #include <vector>
+#include <deque>
 #include <functional>
 
 #include <flatbuffers/flatbuffers.h>
@@ -29,14 +30,10 @@ namespace agent
 		 * 
 		 * @param __id The ID number for this worker
 		 */
-		IWorker(unsigned int __id, bool _start = true)
+		IWorker(unsigned int __id)
 		{
 			_id = __id;
 			_state.store(WORKER_READY); ///< Sets the default to "ready"
-
-			// Default is to start the thread immediately
-			if (_start)
-				Run();
 		}
 
 		/**
@@ -45,15 +42,11 @@ namespace agent
 		 * @param __id Desired worker ID
 		 * @param __name Desired worker name
 		 */
-		IWorker(unsigned int __id, std::string __name, bool _start = true)
+		IWorker(unsigned int __id, std::string __name)
 		{
 			_id = __id;
 			_name = __name;
 			_state.store(WORKER_READY);
-
-			// Default is to start the thread immediately
-			if (_start)
-				Run();
 		}
 
 		/**
@@ -62,11 +55,13 @@ namespace agent
 		 */
 		virtual ~IWorker()
 		{
-			if (_thread != nullptr && _thread->joinable())
-			{
-				_thread->join();
-				delete _thread;
-			}
+			// Wait for threads to finish
+			for (auto thr = _threads.begin(); thr != _threads.end(); ++thr)
+				if (thr->joinable())
+					thr->join();
+
+			// Just to be pedantic
+			_state.store(WORKER_READY);
 		}
 
 		/**
@@ -75,10 +70,29 @@ namespace agent
 		 * This function exists for the case that you might want to inherit \c
 		 * IWorker and do more setup of the object before starting the thread
 		 */
-		void Run()
+		void Run(std::size_t _nthread = 1)
 		{
-			_thread = new std::thread(std::ref(*this));
+			for (int tid = 0; tid < _nthread; ++tid)
+				_threads.emplace_back(std::ref(*this));
 			_state.store(WORKER_RUNNING);
+		}
+
+		/**
+		 * @brief Stops all threads
+		 * 
+		 */
+		void Stop()
+		{
+			// Tell threads to quit
+			SetQuit();
+
+			// Wait until they join
+			for (auto thr = _threads.begin(); thr != _threads.end(); ++thr)
+				if (thr->joinable())
+					thr->join();
+
+			// Threads stopped; ready for another run
+			_state.store(WORKER_READY);
 		}
 
 		/**
@@ -135,7 +149,7 @@ namespace agent
 		void AddMessage(void* _msg, flatbuffers::uoffset_t _size)
 		{
 			_data_lock.lock();
-			_data.push_back(std::pair<void*, flatbuffers::uoffset_t>(_msg, _size));
+			_data.push_front(std::pair<void*, flatbuffers::uoffset_t>(_msg, _size));
 			_data_lock.unlock();
 		}
 
@@ -160,9 +174,9 @@ namespace agent
 		virtual void operator()() = 0;
 
 	protected:
-		std::vector<std::pair<void*, flatbuffers::uoffset_t>> _data; ///< Queue of messages
+		std::deque<std::pair<void*, flatbuffers::uoffset_t>> _data; ///< Queue of messages
 		std::mutex _data_lock; ///< Mutex lock for the \c _data queue
-		std::thread* _thread; ///< Thread object storing the running operator()
+		std::vector<std::thread> _threads; ///< All of the threads running on the worker
 
 	private:
 		unsigned int _id; ///< Unique ID of the worker
