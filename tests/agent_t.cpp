@@ -1,6 +1,7 @@
 #include "agent/agent.hpp"
 #include "Worker.hpp"
 #include "ConnectionHandler.hpp"
+#include "AMQPWorker.hpp"
 #include "Message_generated.h"
 
 #include <thread>
@@ -34,15 +35,16 @@ class ConnectionHandlerTest : public ::testing::Test
 protected:
   void SetUp() override
   {
-    handler = new ConnectionHandler(0);
+    amqpWorker = new AMQPWorker(0, "rabbitmq", 5672, "AMQPWorker");
   }
 
   void TearDown() override
   {
-    
+    std::this_thread::sleep_for(std::chrono::seconds(4));
+    delete amqpWorker;
   }
 
-  ConnectionHandler* handler;
+  AMQPWorker* amqpWorker;
 };
 
 TEST_F(WorkerTest, CreateWorker)
@@ -81,11 +83,7 @@ TEST_F(WorkerTest, CreateWorker)
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 
-  // Wait for a bit
-  std::this_thread::sleep_for(std::chrono::seconds(1));
-
   // Exit the thread
-  //worker->SetQuit();
   worker->Stop();
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
   worker->Run();
@@ -99,10 +97,15 @@ TEST_F(WorkerTest, CreateWorker)
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 
-  //worker->Stop();
+  // Quit all threads
   worker->SetQuit();
 
   EXPECT_EQ(1, 1);
+}
+
+TEST_F(ConnectionHandlerTest, CreateConnectionHandler)
+{
+  std::this_thread::sleep_for(std::chrono::seconds(10));
 }
 
 TEST(add_one, sample)

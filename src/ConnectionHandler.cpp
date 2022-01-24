@@ -5,8 +5,10 @@
 #include <vector>
 #include <cstdint>
 #include <string>
+#include <sstream>
 
 #include <amqpcpp.h>
+#include <spdlog/spdlog.h>
 #include <Poco/Net/StreamSocket.h>
 
 agent::ConnectionHandler::ConnectionHandler(unsigned int _id)
@@ -28,9 +30,6 @@ agent::ConnectionHandler::ConnectionHandler(unsigned int _id)
   // Set up the AMQP::Connection here and then Run()
   _socket.connect(_address);
   _socket.setKeepAlive(true);
-
-  // Now you can run since the operator() needs connected first
-  Run();
 }
 
 agent::ConnectionHandler::ConnectionHandler(
@@ -57,9 +56,6 @@ agent::ConnectionHandler::ConnectionHandler(
   // Set up the AMQP::Connection here and then Run()
   _socket.connect(_address);
   _socket.setKeepAlive(true);
-
-  // Now you can run since the operator() needs connected first
-  Run();
 }
 
 agent::ConnectionHandler::~ConnectionHandler()
@@ -76,8 +72,14 @@ void agent::ConnectionHandler::onProperties(AMQP::Connection *__connection, cons
     _connection = __connection;
 
   // Print details of the client and server
+  auto _clientss = std::ostringstream();
+  auto _serverss = std::ostringstream();
+
+  _clientss << _client;
+  _serverss << _server;
+
   if (_logger != nullptr)
-    _logger->info("[onProperties] Client: {}, Server: {}", _client, _server);
+    _logger->info("[onProperties] Client: {}, Server: {}", _clientss.str(), _serverss.str());
 }
 
 uint16_t agent::ConnectionHandler::onNegotiate(AMQP::Connection *__connection, uint16_t _interval)
