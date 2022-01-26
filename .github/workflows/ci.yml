@@ -86,3 +86,9 @@ jobs:
       run: |
         lcov --directory ./build/src --capture --output-file coverage.info
         bash <(curl --connect-timeout 10 --retry 5 -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
+
+    - name: Upload
+      uses: codecov/codecov-action@v1
+        with:
+          files: ./coverage.info
+          token: ${{ secrets.CODECOV_TOKEN }}
