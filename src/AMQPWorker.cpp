@@ -44,6 +44,11 @@ agent::AMQPWorker::AMQPWorker(
     }
 }
 
+agent::AMQPWorker::~AMQPWorker()
+{
+    _channel.close();
+}
+
 void agent::AMQPWorker::InitializeQueue()
 {
     _channel.declareQueue(_queue, AMQP::durable);
@@ -69,9 +74,4 @@ void agent::AMQPWorker::SetConsumerCallbacks()
                 _logger->info("Finished message {}", tag);
             }
         ) ;
-}
-
-agent::AMQPWorker::~AMQPWorker()
-{
-    _channel.close();
 }

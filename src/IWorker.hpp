@@ -55,6 +55,9 @@ namespace agent
 		 */
 		virtual ~IWorker()
 		{
+			// Quit the loop
+			SetQuit();
+
 			// Wait for threads to join
 			std::for_each(
 				_threads.begin(),
