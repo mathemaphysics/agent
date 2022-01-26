@@ -102,10 +102,10 @@ TEST_F(WorkerTest, CreateWorker)
   EXPECT_EQ(1, 1);
 }
 
-TEST_F(ConnectionHandlerTest, CreateConnectionHandler)
-{
-  std::this_thread::sleep_for(std::chrono::seconds(2));
-}
+//TEST_F(ConnectionHandlerTest, CreateConnectionHandler)
+//{
+//  std::this_thread::sleep_for(std::chrono::seconds(2));
+//}
 
 TEST(add_one, sample)
 {
