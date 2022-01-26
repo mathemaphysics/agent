@@ -17,20 +17,20 @@ std::size_t agent::Buffer::Write(const char* _input, std::size_t _size)
     
     // Number bytes that would be left over after a write
     std::size_t numBytes = _size + _used;
-    std::size_t writeBytes = 0;
+    std::size_t written = 0;
     
     // If new potential total number bytes < _data's size then write all _size
     if (numBytes < _data.size())
-        writeBytes =  _size;
+        written =  _size;
     else
-        writeBytes = _data.size() - _used; // Else can only write as many
+        written = _data.size() - _used; // Else can only write as many
     
     // Copy new data into place after current data
-    std::memcpy(_data.data(), _input, writeBytes);
-    _used += writeBytes;
+    std::memcpy(_data.data(), _input, written);
+    _used += written;
 
     // Return number of bytes written
-    return writeBytes;
+    return written;
 }
 
 std::size_t agent::Buffer::Available() const

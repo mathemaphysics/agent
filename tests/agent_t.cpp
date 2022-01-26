@@ -1,5 +1,7 @@
 #include "agent/agent.hpp"
 #include "Worker.hpp"
+#include "ConnectionHandler.hpp"
+#include "AMQPWorker.hpp"
 #include "Message_generated.h"
 
 #include <thread>
@@ -11,12 +13,13 @@
 
 using namespace agent;
 
-class AgentWorkerTest : public ::testing::Test
+class WorkerTest : public ::testing::Test
 {
 protected:
   void SetUp() override
   {
-    worker = new Worker(0, "AgentWorkerTest");
+    worker = new Worker(0, "WorkerTest");
+    worker->Run(3);
   }
 
   void TearDown() override
@@ -27,7 +30,23 @@ protected:
   Worker* worker;
 };
 
-TEST_F(AgentWorkerTest, CreateWorker)
+class ConnectionHandlerTest : public ::testing::Test
+{
+protected:
+  void SetUp() override
+  {
+    amqpWorker = new AMQPWorker(1, "rabbitmq", 5672, "AMQPWorker");
+  }
+
+  void TearDown() override
+  {
+    //delete amqpWorker;
+  }
+
+  AMQPWorker* amqpWorker;
+};
+
+TEST_F(WorkerTest, CreateWorker)
 {
   flatbuffers::FlatBufferBuilder builder(AGENT_FB_BUFFER_SIZE);
   auto pixels = builder.CreateVector(
@@ -37,27 +56,56 @@ TEST_F(AgentWorkerTest, CreateWorker)
         4, 0, 1 }
     }
   );
-  auto message = Messages::CreateMessage(builder, 0, 3, 3, pixels);
-  builder.Finish(message);
-  auto buffer = builder.GetBufferPointer();
+
+  // Build message 1
+  auto message1 = Messages::CreateMessage(builder, 0, 3, 3, pixels);
+  builder.Finish(message1);
+  auto buffer1 = builder.GetBufferPointer();
   auto size = builder.GetSize();
+
+  // Build message 2
+  auto message2 = Messages::CreateMessage(builder, 1, 3, 3, pixels);
+  builder.Finish(message2);
+  auto buffer2 = builder.GetBufferPointer();
+
+  // Build message 3
+  auto message3 = Messages::CreateMessage(builder, 2, 3, 3, pixels);
+  builder.Finish(message3);
+  auto buffer3 = builder.GetBufferPointer();
 
   // Add the item for the worker to process
   for (int i = 0; i < 4; i++)
   {
-    worker->AddMessage(buffer, size);
+    worker->AddMessage(buffer1, size);
+    worker->AddMessage(buffer2, size);
+    worker->AddMessage(buffer3, size);
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 
-  // Wait for a bit
-  std::this_thread::sleep_for(std::chrono::seconds(1));
-
   // Exit the thread
+  worker->Stop();
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  worker->Run();
+
+  // Add the item for the worker to process
+  for (int i = 0; i < 4; i++)
+  {
+    worker->AddMessage(buffer1, size);
+    worker->AddMessage(buffer2, size);
+    worker->AddMessage(buffer3, size);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  }
+
+  // Quit all threads
   worker->SetQuit();
 
-  //EXPECT_EQ(worker->ProcessMessage(buffer, size), 0);
   EXPECT_EQ(1, 1);
 }
+
+//TEST_F(ConnectionHandlerTest, CreateConnectionHandler)
+//{
+//  std::this_thread::sleep_for(std::chrono::seconds(2));
+//}
 
 TEST(add_one, sample)
 {

@@ -1,43 +1,59 @@
 #include "agent/agent.hpp"
 #include "ConnectionHandler.hpp"
+#include "IWorker.hpp"
 
 #include <vector>
 #include <cstdint>
 #include <string>
+#include <sstream>
 
 #include <amqpcpp.h>
+#include <spdlog/spdlog.h>
 #include <Poco/Net/StreamSocket.h>
 
-agent::ConnectionHandler::ConnectionHandler()
+agent::ConnectionHandler::ConnectionHandler(unsigned int _id)
     : _client("ConnectionHandler"), // Default client name
-      _quit(false),
       _connected(false),
-      _socket(Poco::Net::SocketAddress("localhost", 5672)),
       _connection(nullptr),
       _inpbuffer(AGENT_CONN_BUFFER_SIZE),
       _tmpbuffer(AGENT_CONN_TEMP_BUFFER_SIZE),
       _outbuffer(AGENT_CONN_BUFFER_SIZE),
-      _logger(nullptr) // Default no logger
-{}
+      _address(Poco::Net::SocketAddress("localhost", 5672)),
+      _logger(nullptr), // Default no logger
+      IWorker(_id)
+{
+  // Just announce the creation of the client; can turn this off via log level
+  if (_logger != nullptr)
+    _logger->info("Client {} created", _client);
+
+  // Set up the AMQP::Connection here and then Run()
+  _socket.connect(_address);
+  _socket.setKeepAlive(true);
+}
 
 agent::ConnectionHandler::ConnectionHandler(
+    unsigned int _id,
     const std::string& _host,
     std::uint16_t _port,
     const std::string& _name
   )
     : _client(_name),
-      _quit(false),
       _connected(false),
-      _socket(Poco::Net::SocketAddress(_host, _port)),
       _connection(nullptr),
       _inpbuffer(AGENT_CONN_BUFFER_SIZE),
       _tmpbuffer(AGENT_CONN_TEMP_BUFFER_SIZE),
       _outbuffer(AGENT_CONN_BUFFER_SIZE),
-      _logger(spdlog::stdout_color_mt(_name))
+      _address(Poco::Net::SocketAddress(_host, _port)),
+      _logger(spdlog::stdout_color_mt(_name)),
+      IWorker(_id, _name)
 {
   // Just announce the creation of the client; can turn this off via log level
   if (_logger != nullptr)
     _logger->info("Client {} created", _client);
+
+  // Set up the AMQP::Connection here and then Run()
+  _socket.connect(_address);
+  _socket.setKeepAlive(true);
 }
 
 void agent::ConnectionHandler::onProperties(AMQP::Connection *__connection, const AMQP::Table &_server, AMQP::Table &_client)
@@ -46,8 +62,14 @@ void agent::ConnectionHandler::onProperties(AMQP::Connection *__connection, cons
     _connection = __connection;
 
   // Print details of the client and server
+  auto _clientss = std::ostringstream();
+  auto _serverss = std::ostringstream();
+
+  _clientss << _client;
+  _serverss << _server;
+
   if (_logger != nullptr)
-    _logger->info("[onProperties] Client: {}, Server: {}", _client, _server);
+    _logger->info("[onProperties] Client: {}, Server: {}", _clientss.str(), _serverss.str());
 }
 
 uint16_t agent::ConnectionHandler::onNegotiate(AMQP::Connection *__connection, uint16_t _interval)
@@ -124,10 +146,15 @@ void agent::ConnectionHandler::onClosed(AMQP::Connection *__connection)
   quit();
 }
 
+int agent::ConnectionHandler::ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const
+{
+  return 0;
+}
+
 void agent::ConnectionHandler::operator()()
 {
   // This is the main worker loop for AMQP transactions
-  while (!_quit)
+  while (GetState() != WORKER_QUIT)
   {
     // See if there's any data available on the incoming socket
     const size_t savail = _socket.available();
@@ -162,12 +189,16 @@ void agent::ConnectionHandler::operator()()
         _inpbuffer.Shift(parsed);
     }
     _sendDataFromBuffer();
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
+
+  if (GetState() == WORKER_QUIT && _outbuffer.Available())
+    _sendDataFromBuffer();
 }
 
 void agent::ConnectionHandler::quit()
 {
-  _quit = true;
+  SetQuit();
 }
 
 void agent::ConnectionHandler::_sendDataFromBuffer()
