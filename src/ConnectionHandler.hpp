@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Buffer.hpp"
+#include "IWorker.hpp"
 
 #include <amqpcpp.h>
 #include <Poco/Net/StreamSocket.h>
@@ -12,10 +13,10 @@
 
 namespace agent
 {
-	class ConnectionHandler : public AMQP::ConnectionHandler
+	class ConnectionHandler : public AMQP::ConnectionHandler, public IWorker
 	{
 	public:
-		ConnectionHandler();
+		ConnectionHandler(unsigned int __id);
 
 		/**
 		 * @brief Construct a new Connection Handler object
@@ -25,7 +26,14 @@ namespace agent
 		 * @param _name Client name to assign the consumer
 		 * @param _logname Name to give the logger
 		 */
-		ConnectionHandler(const std::string& _host, std::uint16_t _port, const std::string& _name);
+		ConnectionHandler(unsigned int __id, const std::string& _host, std::uint16_t _port, const std::string& _name);
+
+		/**
+		 * @brief Destroy the Connection Handler object
+		 * 
+		 * Not default because we need to shut off the \c AMQP::Connection close
+		 * the \c StreamSocket and delete the pointer to \c _connection
+		 */
 		~ConnectionHandler() = default;
 
 		/**
@@ -85,10 +93,19 @@ namespace agent
 		void onClosed(AMQP::Connection* _connection) override;
 
 		/**
+		 * @brief Overridden function which won't be called
+		 * 
+		 * @param _msg N/A
+		 * @param _size N/A
+		 * @return int N/A
+		 */
+		int ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const override;
+
+		/**
 		 * @brief Function which run the loop
 		 * 
 		 */
-		void operator()();
+		void operator()() override;
 
 		/**
 		 * @brief Sets the quit state to kill the loop
@@ -96,17 +113,19 @@ namespace agent
 		 */
 		void quit();
 
+	protected:
+		std::shared_ptr<spdlog::logger> _logger;
+
 	private:
 		void _connectSocket(Poco::Net::SocketAddress _address);
 		std::string _client;
-		bool _quit;
 		bool _connected;
 		Poco::Net::StreamSocket _socket;
+		const Poco::Net::SocketAddress _address;
 		AMQP::Connection* _connection;
 		Buffer _inpbuffer;
 		Buffer _outbuffer;
 		std::vector<char> _tmpbuffer;
-		std::shared_ptr<spdlog::logger> _logger;
 		void _sendDataFromBuffer();
 	};
 }

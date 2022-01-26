@@ -49,6 +49,51 @@
                 "GIT_PROGRESS": "TRUE",
                 "BUILD_TESTING": "TRUE"
             }
+        },
+        {
+            "name": "agent-makefiles-configure-debug",
+            "displayName": "POCO Unix Makefiles Configuration (Debug)",
+            "description": "Default build using Unix Makefiles generator",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "ENABLE_ACTIVERECORD": "FALSE",
+                "ENABLE_ACTIVERECORD_COMPILER": "FALSE",
+                "ENABLE_APACHECONNECTOR": "FALSE",
+                "ENABLE_CPPPARSER": "FALSE",
+                "ENABLE_CRYPTO": "FALSE",
+                "ENABLE_DATA": "FALSE",
+                "ENABLE_DATA_MYSQL": "FALSE",
+                "ENABLE_DATA_ODBC": "FALSE",
+                "ENABLE_DATA_POSTGRESQL": "FALSE",
+                "ENABLE_DATA_SQLITE": "FALSE",
+                "ENABLE_ENCODINGS": "FALSE",
+                "ENABLE_ENCODINGS_COMPILER": "FALSE",
+                "ENABLE_FOUNDATION": "TRUE",
+                "ENABLE_JSON": "FALSE",
+                "ENABLE_JWT": "FALSE",
+                "ENABLE_MONGODB": "FALSE",
+                "ENABLE_NET": "TRUE",
+                "ENABLE_NETSSL": "FALSE",
+                "ENABLE_NETSSL_WIN": "FALSE",
+                "ENABLE_PAGECOMPILER": "FALSE",
+                "ENABLE_PAGECOMPILER_FILE2PAGE": "FALSE",
+                "ENABLE_PDF": "FALSE",
+                "ENABLE_POCODOC": "FALSE",
+                "ENABLE_REDIS": "FALSE",
+                "ENABLE_SEVENZIP": "FALSE",
+                "ENABLE_TESTS": "FALSE",
+                "ENABLE_UTIL": "FALSE",
+                "ENABLE_XML": "FALSE",
+                "ENABLE_ZIP": "FALSE",
+                "JSONCPP_WITH_TESTS": "FALSE",
+                "JSONCPP_WITH_POST_BUILD_UNITTEST": "FALSE",
+                "JSONCPP_WITH_PKGCONFIG_SUPPORT": "FALSE",
+                "FETCHCONTENT_QUIET": "FALSE",
+                "GIT_PROGRESS": "TRUE",
+                "BUILD_TESTING": "TRUE"
+            }
         }
     ],
     "buildPresets": [
@@ -56,6 +101,11 @@
             "name": "agent-makefiles-build",
             "displayName": "POCO Unix Makefiles Build",
             "configurePreset": "agent-makefiles-configure"
+        },
+        {
+            "name": "agent-makefiles-build-debug",
+            "displayName": "POCO Unix Makefiles Build (Debug)",
+            "configurePreset": "agent-makefiles-configure-debug"
         }
     ],
     "testPresets": [
@@ -63,6 +113,18 @@
             "name": "agent-makefiles-test",
             "displayName": "POCO Unix Makefiles Test",
             "configurePreset": "agent-makefiles-configure",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        },
+        {
+            "name": "agent-makefiles-test-debug",
+            "displayName": "POCO Unix Makefiles Test (Debug)",
+            "configurePreset": "agent-makefiles-configure-debug",
             "output": {
                 "outputOnFailure": true
             },

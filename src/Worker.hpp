@@ -10,7 +10,7 @@
 #include <spdlog/spdlog.h>
 
 /**
- * @brief agent is the total namespace
+ * @brief agent is the total namespace for the agent project
  * 
  */
 namespace agent
@@ -28,7 +28,7 @@ namespace agent
 		 * @param _id ID to assign to this \c Worker
 		 * @param _start Start thread immediately if true, else not
 		 */
-		Worker(unsigned int _id, bool _start = true);
+		Worker(unsigned int _id);
 
 		/**
 		 * @brief Construct a new Worker object
@@ -37,8 +37,16 @@ namespace agent
 		 * @param _name Name to assign the \c Worker
 		 * @param _start Start thread immediately if true, else not
 		 */
-		Worker(unsigned int _id, std::string _name, bool _start = true);
+		Worker(unsigned int _id, std::string _name);
 		~Worker();
+
+		/**
+		 * @brief Converts a \c std::thread::id to \c std::string
+		 * 
+		 * @param _tid Thread ID
+		 * @return std::string Converted string
+		 */
+		static std::string ThreadToString(std::thread::id _tid);
 
 		/**
 		 * @brief The function which does the work on each message
@@ -54,7 +62,7 @@ namespace agent
 		int ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const override;
 		void operator()() override;
 
-	private:
+	protected:
 		std::shared_ptr<spdlog::logger> _logger = nullptr;
 	};
 }

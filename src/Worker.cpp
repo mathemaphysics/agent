@@ -4,28 +4,41 @@
 #include <iostream>
 #include <exception>
 #include <utility>
+#include <string>
+#include <sstream>
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-agent::Worker::Worker(unsigned int _id, bool _start)
-    : IWorker(_id, _start)
+agent::Worker::Worker(unsigned int _id)
+    : IWorker(_id)
 {
-    _logger = spdlog::stdout_color_mt(GetName());
+    // Check if logger called GetName() exists, else create it
+    _logger = spdlog::get(GetName());
+    if (_logger == nullptr)
+        _logger = spdlog::stdout_color_mt(GetName());
 }
 
-agent::Worker::Worker(unsigned int _id, std::string _name, bool _start)
-    : IWorker(_id, _name, _start)
+agent::Worker::Worker(unsigned int _id, std::string _name)
+    : IWorker(_id, _name)
 {
-    _logger = spdlog::stdout_color_mt(GetName());
+    _logger = spdlog::get(GetName());
+    if (_logger == nullptr)
+        _logger = spdlog::stdout_color_mt(GetName());
 }
 
 agent::Worker::~Worker()
 {
-    if (_logger != nullptr)
-        _logger->info("Thread {} finished", GetId());
-    else
-        std::cout << "Thread " << GetId() << " finished" << std::endl;
+    _logger->info("Worker {} finished", GetId());
+}
+
+std::string agent::Worker::ThreadToString(std::thread::id _tid)
+{
+    auto ssThread = std::ostringstream();
+
+    ssThread << _tid;
+
+    return ssThread.str();
 }
 
 int agent::Worker::ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const
@@ -36,10 +49,9 @@ int agent::Worker::ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size
     int height = message->height();
     auto pixels = message->pixels()->Data();
 
-    if (_logger != nullptr)
-        _logger->info("Received message: id: {} width: {} height: {}", id, width, height);
-    else
-        std::cout << "Received message: id: " << id << " width: " << width << " height: " << height << std::endl;
+    _logger->info("[{}] Received message: id: {} width: {} height: {}",
+        ThreadToString(std::this_thread::get_id()),
+        id, width, height);
 
     return id;
 }
@@ -48,31 +60,36 @@ void agent::Worker::operator()()
 {
     while (GetState() != WORKER_QUIT)
     {
+        // Create space for a potential message
+        bool received = false;
+        std::pair<void *, flatbuffers::uoffset_t> curmsg;
+
+        // Lock _data and grab a message
+        _data_lock.lock();
         if (!_data.empty())
         {
-            // Remove a serialized message from the queue
-            _data_lock.lock();
-            const auto curMsg = _data.back();
+            curmsg = _data.back();
             _data.pop_back();
-            _data_lock.unlock();
+            received = true;
+        }
+        _data_lock.unlock();
 
+        // Now the lock is off; process the message
+        if (received)
+        {
             // Now process it
-            const auto message = curMsg.first;
-            const auto size = curMsg.second;
+            const auto message = curmsg.first;
+            const auto size = curmsg.second;
             try
             {
                 int msgId = ProcessMessage(message, size);
-                if (_logger != nullptr)
-                    _logger->info("Successfully processed message {}", msgId);
-                else
-                    std::cout << "Successfully processed message " << msgId << std::endl;
+                _logger->info("[{}] Successfully processed message {}",
+                    ThreadToString(std::this_thread::get_id()),
+                    msgId);
             }
             catch(const std::exception& e)
             {
-                if (_logger != nullptr)
-                    _logger->critical(e.what());
-                else
-                    std::cout << e.what() << std::endl;
+                _logger->critical(e.what());
             }
         }
     }
