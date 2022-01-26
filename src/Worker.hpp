@@ -62,7 +62,7 @@ namespace agent
 		int ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const override;
 		void operator()() override;
 
-	private:
+	protected:
 		std::shared_ptr<spdlog::logger> _logger = nullptr;
 	};
 }

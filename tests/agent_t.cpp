@@ -35,13 +35,12 @@ class ConnectionHandlerTest : public ::testing::Test
 protected:
   void SetUp() override
   {
-    amqpWorker = new AMQPWorker(0, "rabbitmq", 5672, "AMQPWorker");
+    amqpWorker = new AMQPWorker(1, "rabbitmq", 5672, "AMQPWorker");
   }
 
   void TearDown() override
   {
-    std::this_thread::sleep_for(std::chrono::seconds(4));
-    delete amqpWorker;
+    //delete amqpWorker;
   }
 
   AMQPWorker* amqpWorker;
@@ -105,7 +104,7 @@ TEST_F(WorkerTest, CreateWorker)
 
 TEST_F(ConnectionHandlerTest, CreateConnectionHandler)
 {
-  std::this_thread::sleep_for(std::chrono::seconds(10));
+  std::this_thread::sleep_for(std::chrono::seconds(2));
 }
 
 TEST(add_one, sample)

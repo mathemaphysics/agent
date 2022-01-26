@@ -13,21 +13,23 @@
 agent::Worker::Worker(unsigned int _id)
     : IWorker(_id)
 {
-    _logger = spdlog::stdout_color_mt(GetName());
+    // Check if logger called GetName() exists, else create it
+    _logger = spdlog::get(GetName());
+    if (_logger == nullptr)
+        _logger = spdlog::stdout_color_mt(GetName());
 }
 
 agent::Worker::Worker(unsigned int _id, std::string _name)
     : IWorker(_id, _name)
 {
-    _logger = spdlog::stdout_color_mt(GetName());
+    _logger = spdlog::get(GetName());
+    if (_logger == nullptr)
+        _logger = spdlog::stdout_color_mt(GetName());
 }
 
 agent::Worker::~Worker()
 {
-    if (_logger != nullptr)
-        _logger->info("Worker {} finished", GetId());
-    else
-        std::cout << "Worker " << GetId() << " finished" << std::endl;
+    _logger->info("Worker {} finished", GetId());
 }
 
 std::string agent::Worker::ThreadToString(std::thread::id _tid)
@@ -47,16 +49,9 @@ int agent::Worker::ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size
     int height = message->height();
     auto pixels = message->pixels()->Data();
 
-    if (_logger != nullptr)
-        _logger->info("[{}] Received message: id: {} width: {} height: {}",
-            ThreadToString(std::this_thread::get_id()),
-            id, width, height);
-    else
-        std::cout << "[" << std::this_thread::get_id() << "] "
-            << "Received message: id: " << id
-            << " width: " << width
-            << " height: " << height
-            << std::endl;
+    _logger->info("[{}] Received message: id: {} width: {} height: {}",
+        ThreadToString(std::this_thread::get_id()),
+        id, width, height);
 
     return id;
 }
@@ -88,22 +83,13 @@ void agent::Worker::operator()()
             try
             {
                 int msgId = ProcessMessage(message, size);
-                if (_logger != nullptr)
-                    _logger->info("[{}] Successfully processed message {}",
-                        ThreadToString(std::this_thread::get_id()),
-                        msgId);
-                else
-                    std::cout << "[" << std::this_thread::get_id() << "] "
-                        << "Successfully processed message "
-                        << msgId
-                        << std::endl;
+                _logger->info("[{}] Successfully processed message {}",
+                    ThreadToString(std::this_thread::get_id()),
+                    msgId);
             }
             catch(const std::exception& e)
             {
-                if (_logger != nullptr)
-                    _logger->critical(e.what());
-                else
-                    std::cout << e.what() << std::endl;
+                _logger->critical(e.what());
             }
         }
     }

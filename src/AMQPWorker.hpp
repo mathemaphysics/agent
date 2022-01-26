@@ -6,6 +6,7 @@
 #include <cstdlib>
 
 #include <amqpcpp.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace agent
 {
@@ -34,7 +35,10 @@ namespace agent
 			std::string _vhost = "/"
 		);
 
-		~AMQPWorker() = default;
+		~AMQPWorker();
+
+		void InitializeQueue();
+		void SetConsumerCallbacks();
 
 	private:
 		ConnectionHandler _handler;
@@ -44,5 +48,6 @@ namespace agent
 		std::string _queue = "Queue";
 		std::string _exchange = "Exchange";
 		std::string _key = "Queue";
+		std::shared_ptr<spdlog::logger> _logger;
 	};
 }

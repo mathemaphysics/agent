@@ -34,7 +34,7 @@ namespace agent
 		 * Not default because we need to shut off the \c AMQP::Connection close
 		 * the \c StreamSocket and delete the pointer to \c _connection
 		 */
-		~ConnectionHandler();
+		~ConnectionHandler() = default;
 
 		/**
 		 * @brief Callback for the properties action from AMQP server
@@ -113,10 +113,12 @@ namespace agent
 		 */
 		void quit();
 
+	protected:
+		std::shared_ptr<spdlog::logger> _logger;
+
 	private:
 		void _connectSocket(Poco::Net::SocketAddress _address);
 		std::string _client;
-		bool _quit;
 		bool _connected;
 		Poco::Net::StreamSocket _socket;
 		const Poco::Net::SocketAddress _address;
@@ -124,7 +126,6 @@ namespace agent
 		Buffer _inpbuffer;
 		Buffer _outbuffer;
 		std::vector<char> _tmpbuffer;
-		std::shared_ptr<spdlog::logger> _logger;
 		void _sendDataFromBuffer();
 	};
 }

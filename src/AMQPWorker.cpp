@@ -15,21 +15,19 @@ agent::AMQPWorker::AMQPWorker(
     : _handler(_id, _host, _port, _name),
       _creds(_user, _pass),
       _connection(&_handler, _creds, _vhost),
-      _channel(&_connection)
+      _channel(&_connection),
+      _logger(nullptr)
 {
-    // Set the consumer callbacks here
-    _channel.declareQueue(_queue, AMQP::durable);
-    _channel.declareExchange(_exchange);
-    _channel.bindQueue(_exchange, _queue, _key);
-    _channel.consume(
-            _queue,
-            _key
-        )
-        .onReceived(
-            [this](const AMQP::Message& message, uint64_t tag, bool redelivered){
-                std::cout << "Received a message";
-            }
-        );
+    // Create the logger first
+    _logger = spdlog::get(_handler.GetName());
+    if (_logger == nullptr)
+        _logger = spdlog::stdout_color_mt(_handler.GetName());
+
+    // Declare the queue and exchange and bind them
+    InitializeQueue();
+
+    // Set the worker callbacks
+    SetConsumerCallbacks();
 
     // Start the threads
     try
@@ -38,7 +36,42 @@ agent::AMQPWorker::AMQPWorker(
     }
     catch(const std::exception& e)
     {
-        std::cerr << e.what() << '\n';
+        _logger->error("Exception caught: {}", e.what());
     }
-    
+    catch(...)
+    {
+        _logger->error("Anonymous exception caught");
+    }
+}
+
+void agent::AMQPWorker::InitializeQueue()
+{
+    _channel.declareQueue(_queue, AMQP::durable);
+    _channel.declareExchange(_exchange);
+    _channel.bindQueue(_exchange, _queue, _key);
+}
+
+void agent::AMQPWorker::SetConsumerCallbacks()
+{
+    // Set the consumer callbacks here
+    _channel.consume(
+            _queue,
+            _key
+        ).onReceived(
+            [this](const AMQP::Message& message, uint64_t tag, bool redelivered) {
+                auto rawmsg = std::string(message.body(), message.body() + message.bodySize());
+                _logger->info("Received message:");
+                _logger->info(rawmsg);
+            }
+        ).onComplete(
+            [this](uint64_t tag, bool result) {
+                _channel.ack(tag);
+                _logger->info("Finished message {}", tag);
+            }
+        ) ;
+}
+
+agent::AMQPWorker::~AMQPWorker()
+{
+    _channel.close();
 }

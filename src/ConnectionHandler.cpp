@@ -13,7 +13,6 @@
 
 agent::ConnectionHandler::ConnectionHandler(unsigned int _id)
     : _client("ConnectionHandler"), // Default client name
-      _quit(false),
       _connected(false),
       _connection(nullptr),
       _inpbuffer(AGENT_CONN_BUFFER_SIZE),
@@ -39,7 +38,6 @@ agent::ConnectionHandler::ConnectionHandler(
     const std::string& _name
   )
     : _client(_name),
-      _quit(false),
       _connected(false),
       _connection(nullptr),
       _inpbuffer(AGENT_CONN_BUFFER_SIZE),
@@ -56,14 +54,6 @@ agent::ConnectionHandler::ConnectionHandler(
   // Set up the AMQP::Connection here and then Run()
   _socket.connect(_address);
   _socket.setKeepAlive(true);
-}
-
-agent::ConnectionHandler::~ConnectionHandler()
-{
-  _connection->close();
-  _socket.close();
-
-  delete _connection;
 }
 
 void agent::ConnectionHandler::onProperties(AMQP::Connection *__connection, const AMQP::Table &_server, AMQP::Table &_client)
@@ -164,7 +154,7 @@ int agent::ConnectionHandler::ProcessMessage(const void* _msg, flatbuffers::uoff
 void agent::ConnectionHandler::operator()()
 {
   // This is the main worker loop for AMQP transactions
-  while (!_quit)
+  while (GetState() != WORKER_QUIT)
   {
     // See if there's any data available on the incoming socket
     const size_t savail = _socket.available();
@@ -199,12 +189,16 @@ void agent::ConnectionHandler::operator()()
         _inpbuffer.Shift(parsed);
     }
     _sendDataFromBuffer();
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
+
+  if (GetState() == WORKER_QUIT && _outbuffer.Available())
+    _sendDataFromBuffer();
 }
 
 void agent::ConnectionHandler::quit()
 {
-  _quit = true;
+  SetQuit();
 }
 
 void agent::ConnectionHandler::_sendDataFromBuffer()
