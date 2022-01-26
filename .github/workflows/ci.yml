@@ -89,6 +89,6 @@ jobs:
 
     - name: Upload
       uses: codecov/codecov-action@v1
-        with:
-          files: ./coverage.info
-          token: ${{ secrets.CODECOV_TOKEN }}
+      with:
+        files: ./coverage.info
+        token: ${{ secrets.CODECOV_TOKEN }}
