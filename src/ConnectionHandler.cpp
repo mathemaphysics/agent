@@ -22,9 +22,13 @@ agent::ConnectionHandler::ConnectionHandler(unsigned int _id)
       _logger(nullptr), // Default no logger
       IWorker(_id)
 {
+  // Check if logger called GetName() exists, else create it
+  _logger = spdlog::get(_client);
+  if (_logger == nullptr)
+    _logger = spdlog::stdout_color_mt(_client);
+
   // Just announce the creation of the client; can turn this off via log level
-  if (_logger != nullptr)
-    _logger->info("Client {} created", _client);
+  _logger->info("Client {} created", _client);
 
   // Set up the AMQP::Connection here and then Run()
   _socket.connect(_address);
@@ -44,12 +48,15 @@ agent::ConnectionHandler::ConnectionHandler(
       _tmpbuffer(AGENT_CONN_TEMP_BUFFER_SIZE),
       _outbuffer(AGENT_CONN_BUFFER_SIZE),
       _address(Poco::Net::SocketAddress(_host, _port)),
-      _logger(spdlog::stdout_color_mt(_name)),
       IWorker(_id, _name)
 {
+  // Check if logger called GetName() exists, else create it
+  _logger = spdlog::get(_client);
+  if (_logger == nullptr)
+    _logger = spdlog::stdout_color_mt(_client);
+  
   // Just announce the creation of the client; can turn this off via log level
-  if (_logger != nullptr)
-    _logger->info("Client {} created", _client);
+  _logger->info("Client {} created", _client);
 
   // Set up the AMQP::Connection here and then Run()
   _socket.connect(_address);
@@ -68,8 +75,7 @@ void agent::ConnectionHandler::onProperties(AMQP::Connection *__connection, cons
   _clientss << _client;
   _serverss << _server;
 
-  if (_logger != nullptr)
-    _logger->info("[onProperties] Client: {}, Server: {}", _clientss.str(), _serverss.str());
+  _logger->info("[onProperties] Client: {}, Server: {}", _clientss.str(), _serverss.str());
 }
 
 uint16_t agent::ConnectionHandler::onNegotiate(AMQP::Connection *__connection, uint16_t _interval)
@@ -78,8 +84,7 @@ uint16_t agent::ConnectionHandler::onNegotiate(AMQP::Connection *__connection, u
     _connection = __connection;
 
   // Print details of the heartbeat negotiation
-  if (_logger != nullptr)
-    _logger->info("[onNegotiate] Accepting interval of length {}", _interval);
+  _logger->info("[onNegotiate] Accepting interval of length {}", _interval);
 
   // Just accept the interval
   return _interval;
@@ -94,8 +99,7 @@ void agent::ConnectionHandler::onData(AMQP::Connection *__connection, const char
   _socket.sendBytes(_data, _size);
 
   // TODO: Maybe make this debug level?
-  if (_logger != nullptr)
-    _logger->info("[onData] Sent {} bytes", _size);
+  _logger->info("[onData] Sent {} bytes", _size);
 }
 
 void agent::ConnectionHandler::onHeartbeat(AMQP::Connection *__connection)
@@ -104,8 +108,7 @@ void agent::ConnectionHandler::onHeartbeat(AMQP::Connection *__connection)
     _connection = __connection;
 
   // Announce that we received a heartbeat from the AMQP server
-  if (_logger != nullptr)
-    _logger->info("[onHeartbeat] Received a heartbeat from server");
+  _logger->info("[onHeartbeat] Received a heartbeat from server");
 
   // Send a return heartbeat; this isn't ideal because it depends on receiving a
   // heartbeat first, which might not happen. Set up an independent thread that
@@ -119,8 +122,7 @@ void agent::ConnectionHandler::onError(AMQP::Connection *__connection, const cha
     _connection = __connection;
 
   // Announce that we received a heartbeat from the AMQP server
-  if (_logger != nullptr)
-    _logger->info("[onError] Error: {}", _message);
+  _logger->info("[onError] Error: {}", _message);
 }
 
 void agent::ConnectionHandler::onReady(AMQP::Connection *__connection)
@@ -129,8 +131,7 @@ void agent::ConnectionHandler::onReady(AMQP::Connection *__connection)
     _connection = __connection;
 
   // Notify the log that the connection is read
-  if (_logger != nullptr)
-    _logger->info("[onReady] Connection is ready");
+  _logger->info("[onReady] Connection is ready");
 }
 
 void agent::ConnectionHandler::onClosed(AMQP::Connection *__connection)
@@ -139,8 +140,7 @@ void agent::ConnectionHandler::onClosed(AMQP::Connection *__connection)
     _connection = __connection;
 
   // Announce and close the connection
-  if (_logger != nullptr)
-    _logger->info("[onClosed] Connection closed");
+  _logger->info("[onClosed] Connection closed");
 
   // Exit the loop
   quit();
@@ -169,13 +169,11 @@ void agent::ConnectionHandler::operator()()
       const int wbytes = _inpbuffer.Write(_tmpbuffer.data(), rbytes);
 
       if (wbytes != rbytes)
-        if (_logger != nullptr)
-          _logger->debug("Could not write full contents to input buffer");
+        _logger->debug("Could not write full contents to input buffer");
     }
     else if (savail < 0)
     {
-      if (_logger != nullptr)
-        _logger->error("Socket error: Available bytes on socket < 0");
+      _logger->error("Socket error: Available bytes on socket < 0");
     }
 
     const size_t iavail = _inpbuffer.Available();
@@ -207,7 +205,6 @@ void agent::ConnectionHandler::_sendDataFromBuffer()
   if (avail > 0)
   {
     int sent = _socket.sendBytes(_outbuffer.Data(), avail);
-    if (_logger != nullptr)
-      _logger->info("Sent [{:6d} / {:6d}] bytes from buffer", sent, avail);
+    _logger->info("Sent [{:6d} / {:6d}] bytes from buffer", sent, avail);
   }
 }
