@@ -8,8 +8,11 @@
 #include <vector>
 #include <deque>
 #include <functional>
+#include <sstream>
 
 #include <flatbuffers/flatbuffers.h>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace agent
 {
@@ -34,6 +37,11 @@ namespace agent
 		{
 			_id = __id;
 			_state.store(WORKER_READY); ///< Sets the default to "ready"
+
+			// Check if logger called GetName() exists, else create it
+			_logger = spdlog::get(_name);
+			if (_logger == nullptr)
+				_logger = spdlog::stdout_color_mt(_name);
 		}
 
 		/**
@@ -47,6 +55,11 @@ namespace agent
 			_id = __id;
 			_name = __name;
 			_state.store(WORKER_READY);
+
+			// Use the given name as name for _logger
+			_logger = spdlog::get(__name);
+			if (_logger == nullptr)
+				_logger = spdlog::stdout_color_mt(__name);
 		}
 
 		/**
@@ -190,16 +203,70 @@ namespace agent
 		 * until \c _data is exhausted.
 		 * 
 		 */
-		virtual void operator()() = 0;
+		virtual void operator()()
+		{
+			while (GetState() != WORKER_QUIT)
+			{
+				// Create space for a potential message
+				bool received = false;
+				std::pair<void *, flatbuffers::uoffset_t> curmsg;
+
+				// Lock _data and grab a message
+				_data_lock.lock();
+				if (!_data.empty())
+				{
+					curmsg = _data.back();
+					_data.pop_back();
+					received = true;
+				}
+				_data_lock.unlock();
+
+				// Now the lock is off; process the message
+				if (received)
+				{
+					// Now process it
+					const auto message = curmsg.first;
+					const auto size = curmsg.second;
+					try
+					{
+						int msgId = ProcessMessage(message, size);
+						_logger->info("[{}] Successfully processed message {}",
+							ThreadToString(std::this_thread::get_id()),
+							msgId);
+					}
+					catch(const std::exception& e)
+					{
+						_logger->critical(e.what());
+					}
+				}
+			}
+		}
+
+
+		/**
+		 * @brief Converts a \c std::thread::id to \c std::string
+		 * 
+		 * @param _tid Thread ID
+		 * @return std::string Converted string
+		 */
+		static std::string ThreadToString(std::thread::id _tid)
+		{
+			auto ssThread = std::ostringstream();
+
+			ssThread << _tid;
+
+			return ssThread.str();
+		}
 
 	protected:
 		std::deque<std::pair<void*, flatbuffers::uoffset_t>> _data; ///< Queue of messages
 		std::mutex _data_lock; ///< Mutex lock for the \c _data queue
 		std::vector<std::thread> _threads; ///< All of the threads running on the worker
+		std::shared_ptr<spdlog::logger> _logger = nullptr;
 
 	private:
 		unsigned int _id; ///< Unique ID of the worker
-		std::string _name; ///< Name assigned to the worker
+		std::string _name = "IWorker"; ///< Name assigned to the worker
 		std::atomic<WorkerState> _state; ///< State of the worker; 0 -> Ready
 	};
 }
