@@ -26,7 +26,7 @@ namespace agent
 		 * @param _pass AMQP password
 		 */
 		AMQPWorker(
-			int _id,
+			unsigned int _id,
 			std::string _host,
 			std::uint16_t _port,
 			std::string _name,
