@@ -41,14 +41,6 @@ namespace agent
 		~Worker();
 
 		/**
-		 * @brief Converts a \c std::thread::id to \c std::string
-		 * 
-		 * @param _tid Thread ID
-		 * @return std::string Converted string
-		 */
-		static std::string ThreadToString(std::thread::id _tid);
-
-		/**
 		 * @brief The function which does the work on each message
 		 * 
 		 * This is the function which does the job of the \c Worker.
@@ -60,9 +52,5 @@ namespace agent
 		 * @return int ID of the message it processed
 		 */
 		int ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const override;
-		void operator()() override;
-
-	protected:
-		std::shared_ptr<spdlog::logger> _logger = nullptr;
 	};
 }
