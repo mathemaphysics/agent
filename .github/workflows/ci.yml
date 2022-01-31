@@ -26,17 +26,15 @@ jobs:
       with:
         submodules: 'recursive'
 
-
-
-    - name: make build directory
+    - name: Make build directory
       run: cmake -E make_directory ${{runner.workspace}}/build
 
-    - name: configure cmake
+    - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Debug -DBUILD_DOCS=OFF
 
-    - name: build
+    - name: Build
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: cmake --build .
@@ -45,7 +43,6 @@ jobs:
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: ctest
-
 
   coverage-test:
     name: Coverage Testing
@@ -60,35 +57,27 @@ jobs:
       run: |
         sudo apt-get install -y lcov
 
-
-
-    - name: make build directory
+    - name: Make build directory
       run: cmake -E make_directory ${{runner.workspace}}/build
 
-    - name: configure cmake
+    - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: cmake $GITHUB_WORKSPACE -DCMAKE_CXX_FLAGS="--coverage" -DBUILD_DOCS=OFF
 
-    - name: build
+    - name: Build
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: cmake --build .
 
-    - name: run tests
+    - name: Run tests
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: ctest
 
-    - name: collect coverage report
+    - name: Collect coverage report
       shell: bash
       working-directory: ${{runner.workspace}}
       run: |
         lcov --directory ./build/src --capture --output-file coverage.info
         bash <(curl --connect-timeout 10 --retry 5 -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
-
-    - name: Upload
-      uses: codecov/codecov-action@v1
-      with:
-        files: ./coverage.info
-        token: ${{ secrets.CODECOV_TOKEN }}
