@@ -10,7 +10,7 @@
 
 namespace agent
 {
-	class AMQPWorker
+	class AMQPWorker: public ConnectionHandler
 	{
 	public:
 		AMQPWorker() = default;
@@ -41,9 +41,17 @@ namespace agent
 		void SetConsumerCallbacks();
 
 	private:
-		ConnectionHandler _handler;
 		AMQP::Login _creds;
-		AMQP::Connection _connection;
+		
+		/**
+		 * @brief Connection variable _created_ here
+		 * 
+		 * The reason we need another \c _connection comes from the fact that
+		 * the parent class \c ConnectionHandler merely passes around a pointer
+		 * to the connection we create here; it doesn't actually make one, only
+		 * takes what you give it
+		 */
+		AMQP::Connection _connection; // Does not override parent's copy
 		AMQP::Channel _channel;
 		std::string _queue = "Queue";
 		std::string _exchange = "Exchange";

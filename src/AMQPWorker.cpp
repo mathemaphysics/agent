@@ -1,4 +1,5 @@
 #include "AMQPWorker.hpp"
+#include "ConnectionHandler.hpp"
 
 #include <Poco/Exception.h>
 #include <amqpcpp.h>
@@ -12,16 +13,16 @@ agent::AMQPWorker::AMQPWorker(
     std::string _pass,
     std::string _vhost
 )
-    : _handler(_id, _host, _port, _name),
-      _creds(_user, _pass),
-      _connection(&_handler, _creds, _vhost),
-      _channel(&_connection),
-      _logger(nullptr)
+    : _creds(_user, _pass),
+      _connection(this, _creds, _vhost),
+      _channel(&_connection), // Inherited protected from ConnectionHandler
+      _logger(nullptr),
+      ConnectionHandler(_id, _host, _port, _name)
 {
     // Create the logger first
-    _logger = spdlog::get(_handler.GetName());
+    _logger = spdlog::get(GetName());
     if (_logger == nullptr)
-        _logger = spdlog::stdout_color_mt(_handler.GetName());
+        _logger = spdlog::stdout_color_mt(GetName());
 
     // Declare the queue and exchange and bind them
     InitializeQueue();
@@ -32,7 +33,7 @@ agent::AMQPWorker::AMQPWorker(
     // Start the threads
     try
     {
-        _handler.Run();
+        Run();
     }
     catch(const std::exception& e)
     {
@@ -73,5 +74,5 @@ void agent::AMQPWorker::SetConsumerCallbacks()
                 _channel.ack(tag);
                 _logger->info("Finished message {}", tag);
             }
-        ) ;
+        );
 }
