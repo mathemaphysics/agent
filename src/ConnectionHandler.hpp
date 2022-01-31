@@ -99,10 +99,10 @@ namespace agent
 		 * @param _size N/A
 		 * @return int N/A
 		 */
-		int ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const override;
+		int ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const = 0;
 
 		/**
-		 * @brief Function which run the loop
+		 * @brief Function which runs the loop
 		 * 
 		 */
 		void operator()() override;
