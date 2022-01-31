@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <string>
 #include <sstream>
+#include <exception>
 
 #include <amqpcpp.h>
 #include <spdlog/spdlog.h>
@@ -146,10 +147,10 @@ void agent::ConnectionHandler::onClosed(AMQP::Connection *__connection)
   quit();
 }
 
-int agent::ConnectionHandler::ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const
-{
-  return 0;
-}
+//int agent::ConnectionHandler::ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const
+//{
+//  return 0;
+//}
 
 void agent::ConnectionHandler::operator()()
 {
