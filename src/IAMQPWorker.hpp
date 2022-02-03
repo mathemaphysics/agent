@@ -3,7 +3,7 @@
 #include "ConnectionHandler.hpp"
 
 #include <string>
-#include <cstdlib>
+#include <cstdint>
 
 #include <amqpcpp.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -94,12 +94,17 @@ namespace agent
 					_key
 				).onReceived(
 					[this](const AMQP::Message& message, uint64_t tag, bool redelivered) {
+						_logger->info("[onReceived] Received message {}", tag);
 						ProcessMessage(message.body(), message.bodySize());
 					}
 				).onComplete(
 					[this](uint64_t tag, bool result) {
+						_logger->info("[onComplete] Finished message {}", tag);
 						_channel.ack(tag);
-						_logger->info("Finished message {}", tag);
+					}
+				).onError(
+					[this](const char* message){
+						_logger->error("[onError] {}", message);
 					}
 				);
 		}
@@ -114,7 +119,7 @@ namespace agent
 		 * @param _size Size in bytes of the message data
 		 * @return int Tag or message ID processed (or anything you like)
 		 */
-		virtual int ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const = 0;
+		virtual int ProcessMessage(const void* _msg, std::uint32_t _size) const = 0;
 
 	protected:
 		std::shared_ptr<spdlog::logger> _logger; ///< Exposing the logger for subclasses

@@ -1,5 +1,8 @@
 #include "AMQPWorker.hpp"
 
+#include <string>
+#include <cstdint>
+
 agent::AMQPWorker::AMQPWorker(
     unsigned int _id,
     std::string _host,
@@ -14,7 +17,7 @@ agent::AMQPWorker::AMQPWorker(
 
 }
 
-int agent::AMQPWorker::ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const
+int agent::AMQPWorker::ProcessMessage(const void* _msg, std::uint32_t _size) const
 {
     _logger->info("Received a message");
 

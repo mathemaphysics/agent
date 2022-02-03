@@ -147,11 +147,6 @@ void agent::ConnectionHandler::onClosed(AMQP::Connection *__connection)
   quit();
 }
 
-//int agent::ConnectionHandler::ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const
-//{
-//  return 0;
-//}
-
 void agent::ConnectionHandler::operator()()
 {
   // This is the main worker loop for AMQP transactions

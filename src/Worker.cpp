@@ -9,6 +9,7 @@
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <flatbuffers/flatbuffers.h>
 
 agent::Worker::Worker(unsigned int _id)
     : IWorker(_id)
@@ -25,7 +26,7 @@ agent::Worker::~Worker()
     _logger->info("Worker {} finished", GetId());
 }
 
-int agent::Worker::ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const
+int agent::Worker::ProcessMessage(const void* _msg, std::uint32_t _size) const
 {
     auto message = Messages::GetMessage(_msg);
     int id = message->id();

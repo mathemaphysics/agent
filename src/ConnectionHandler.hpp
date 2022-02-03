@@ -99,7 +99,7 @@ namespace agent
 		 * @param _size N/A
 		 * @return int N/A
 		 */
-		int ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const = 0;
+		int ProcessMessage(const void* _msg, std::uint32_t _size) const = 0;
 
 		/**
 		 * @brief Function which runs the loop

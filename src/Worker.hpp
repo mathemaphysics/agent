@@ -6,6 +6,7 @@
 #include <string>
 #include <thread>
 #include <memory>
+#include <cstdint>
 
 #include <spdlog/spdlog.h>
 
@@ -51,6 +52,6 @@ namespace agent
 		 * @param _size Number of bytes contained in the message
 		 * @return int ID of the message it processed
 		 */
-		int ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const override;
+		int ProcessMessage(const void* _msg, std::uint32_t _size) const override;
 	};
 }
