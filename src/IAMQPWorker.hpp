@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ConnectionHandler.hpp"
+#include "IConnectionHandler.hpp"
 
 #include <string>
 #include <cstdint>
@@ -10,7 +10,7 @@
 
 namespace agent
 {
-	class IAMQPWorker : public ConnectionHandler
+	class IAMQPWorker : public IConnectionHandler
 	{
 	public:
 		IAMQPWorker() = default;
@@ -38,7 +38,7 @@ namespace agent
       		  _connection(this, _creds, _vhost),
       		  _channel(&_connection), // Inherited protected from ConnectionHandler
       		  _logger(nullptr),
-      		  ConnectionHandler(_id, _host, _port, _name)
+      		  IConnectionHandler(_id, _host, _port, _name)
 		{
 			// Create the logger first
 			_logger = spdlog::get(GetName());

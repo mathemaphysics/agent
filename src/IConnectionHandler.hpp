@@ -13,10 +13,10 @@
 
 namespace agent
 {
-	class ConnectionHandler : public AMQP::ConnectionHandler, public IWorker
+	class IConnectionHandler : public AMQP::ConnectionHandler, public IWorker
 	{
 	public:
-		ConnectionHandler(unsigned int __id);
+		IConnectionHandler(unsigned int __id);
 
 		/**
 		 * @brief Construct a new Connection Handler object
@@ -26,7 +26,7 @@ namespace agent
 		 * @param _name Client name to assign the consumer
 		 * @param _logname Name to give the logger
 		 */
-		ConnectionHandler(unsigned int __id, const std::string& _host, std::uint16_t _port, const std::string& _name);
+		IConnectionHandler(unsigned int __id, const std::string& _host, std::uint16_t _port, const std::string& _name);
 
 		/**
 		 * @brief Destroy the Connection Handler object
@@ -34,7 +34,7 @@ namespace agent
 		 * Not default because we need to shut off the \c AMQP::Connection close
 		 * the \c StreamSocket and delete the pointer to \c _connection
 		 */
-		~ConnectionHandler() = default;
+		~IConnectionHandler() = default;
 
 		/**
 		 * @brief Callback for the properties action from AMQP server

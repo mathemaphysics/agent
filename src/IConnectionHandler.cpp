@@ -1,5 +1,5 @@
 #include "agent/agent.hpp"
-#include "ConnectionHandler.hpp"
+#include "IConnectionHandler.hpp"
 #include "IWorker.hpp"
 
 #include <vector>
@@ -12,8 +12,8 @@
 #include <spdlog/spdlog.h>
 #include <Poco/Net/StreamSocket.h>
 
-agent::ConnectionHandler::ConnectionHandler(unsigned int _id)
-    : _client("ConnectionHandler"), // Default client name
+agent::IConnectionHandler::IConnectionHandler(unsigned int _id)
+    : _client("IConnectionHandler"), // Default client name
       _connected(false),
       _connection(nullptr),
       _inpbuffer(AGENT_CONN_BUFFER_SIZE),
@@ -36,7 +36,7 @@ agent::ConnectionHandler::ConnectionHandler(unsigned int _id)
   _socket.setKeepAlive(true);
 }
 
-agent::ConnectionHandler::ConnectionHandler(
+agent::IConnectionHandler::IConnectionHandler(
     unsigned int _id,
     const std::string& _host,
     std::uint16_t _port,
@@ -64,7 +64,7 @@ agent::ConnectionHandler::ConnectionHandler(
   _socket.setKeepAlive(true);
 }
 
-void agent::ConnectionHandler::onProperties(AMQP::Connection *__connection, const AMQP::Table &_server, AMQP::Table &_client)
+void agent::IConnectionHandler::onProperties(AMQP::Connection *__connection, const AMQP::Table &_server, AMQP::Table &_client)
 {
   if (_connection == nullptr)
     _connection = __connection;
@@ -79,7 +79,7 @@ void agent::ConnectionHandler::onProperties(AMQP::Connection *__connection, cons
   _logger->info("[onProperties] Client: {}, Server: {}", _clientss.str(), _serverss.str());
 }
 
-uint16_t agent::ConnectionHandler::onNegotiate(AMQP::Connection *__connection, uint16_t _interval)
+uint16_t agent::IConnectionHandler::onNegotiate(AMQP::Connection *__connection, uint16_t _interval)
 {
   if (_connection == nullptr)
     _connection = __connection;
@@ -91,7 +91,7 @@ uint16_t agent::ConnectionHandler::onNegotiate(AMQP::Connection *__connection, u
   return _interval;
 }
 
-void agent::ConnectionHandler::onData(AMQP::Connection *__connection, const char *_data, size_t _size)
+void agent::IConnectionHandler::onData(AMQP::Connection *__connection, const char *_data, size_t _size)
 {
   if (_connection == nullptr)
     _connection = __connection;
@@ -103,7 +103,7 @@ void agent::ConnectionHandler::onData(AMQP::Connection *__connection, const char
   _logger->info("[onData] Sent {} bytes", _size);
 }
 
-void agent::ConnectionHandler::onHeartbeat(AMQP::Connection *__connection)
+void agent::IConnectionHandler::onHeartbeat(AMQP::Connection *__connection)
 {
   if (_connection == nullptr)
     _connection = __connection;
@@ -117,7 +117,7 @@ void agent::ConnectionHandler::onHeartbeat(AMQP::Connection *__connection)
   _connection->heartbeat();
 }
 
-void agent::ConnectionHandler::onError(AMQP::Connection *__connection, const char *_message)
+void agent::IConnectionHandler::onError(AMQP::Connection *__connection, const char *_message)
 {
   if (_connection == nullptr)
     _connection = __connection;
@@ -126,7 +126,7 @@ void agent::ConnectionHandler::onError(AMQP::Connection *__connection, const cha
   _logger->info("[onError] Error: {}", _message);
 }
 
-void agent::ConnectionHandler::onReady(AMQP::Connection *__connection)
+void agent::IConnectionHandler::onReady(AMQP::Connection *__connection)
 {
   if (_connection == nullptr)
     _connection = __connection;
@@ -135,7 +135,7 @@ void agent::ConnectionHandler::onReady(AMQP::Connection *__connection)
   _logger->info("[onReady] Connection is ready");
 }
 
-void agent::ConnectionHandler::onClosed(AMQP::Connection *__connection)
+void agent::IConnectionHandler::onClosed(AMQP::Connection *__connection)
 {
   if (_connection == nullptr)
     _connection = __connection;
@@ -147,7 +147,7 @@ void agent::ConnectionHandler::onClosed(AMQP::Connection *__connection)
   quit();
 }
 
-void agent::ConnectionHandler::operator()()
+void agent::IConnectionHandler::operator()()
 {
   // This is the main worker loop for AMQP transactions
   while (GetState() != WORKER_QUIT)
@@ -190,12 +190,12 @@ void agent::ConnectionHandler::operator()()
     _sendDataFromBuffer();
 }
 
-void agent::ConnectionHandler::quit()
+void agent::IConnectionHandler::quit()
 {
   SetQuit();
 }
 
-void agent::ConnectionHandler::_sendDataFromBuffer()
+void agent::IConnectionHandler::_sendDataFromBuffer()
 {
   size_t avail = _outbuffer.Available();
   if (avail > 0)
