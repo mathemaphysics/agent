@@ -2,6 +2,9 @@
 
 #include "IAMQPWorker.hpp"
 
+#include <string>
+#include <cstdint>
+
 namespace agent
 {
 	class AMQPWorker : public IAMQPWorker
@@ -41,6 +44,6 @@ namespace agent
 			 * @param _size Size of the data
 			 * @return int The message ID processed
 			 */
-			int ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const;
+			int ProcessMessage(const void* _msg, std::uint32_t _size) const;
 	};
 }

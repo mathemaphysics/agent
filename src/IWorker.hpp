@@ -9,8 +9,8 @@
 #include <deque>
 #include <functional>
 #include <sstream>
+#include <cstdint>
 
-#include <flatbuffers/flatbuffers.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
@@ -178,10 +178,10 @@ namespace agent
 			_state.store(WORKER_QUIT);
 		}
 
-		void AddMessage(void* _msg, flatbuffers::uoffset_t _size)
+		void AddMessage(void* _msg, std::uint32_t _size)
 		{
 			_data_lock.lock();
-			_data.push_front(std::pair<void*, flatbuffers::uoffset_t>(_msg, _size));
+			_data.push_front(std::pair<void*, std::uint32_t>(_msg, _size));
 			_data_lock.unlock();
 		}
 
@@ -194,7 +194,7 @@ namespace agent
 		 * @param _size Number of bytes in the serialized message in \c _msg
 		 * @return int Unique ID of the message processed
 		 */
-		virtual int ProcessMessage(const void* _msg, flatbuffers::uoffset_t _size) const = 0;
+		virtual int ProcessMessage(const void* _msg, std::uint32_t _size) const = 0;
 
 		/**
 		 * @brief Contains the main work loop
@@ -209,7 +209,7 @@ namespace agent
 			{
 				// Create space for a potential message
 				bool received = false;
-				std::pair<void *, flatbuffers::uoffset_t> curmsg;
+				std::pair<void *, std::uint32_t> curmsg;
 
 				// Lock _data and grab a message
 				_data_lock.lock();
@@ -259,7 +259,7 @@ namespace agent
 		}
 
 	protected:
-		std::deque<std::pair<void*, flatbuffers::uoffset_t>> _data; ///< Queue of messages
+		std::deque<std::pair<void*, std::uint32_t>> _data; ///< Queue of messages
 		std::mutex _data_lock; ///< Mutex lock for the \c _data queue
 		std::vector<std::thread> _threads; ///< All of the threads running on the worker
 		std::shared_ptr<spdlog::logger> _logger = nullptr;
