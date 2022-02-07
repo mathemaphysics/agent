@@ -21,7 +21,7 @@ RUN apt-get -y update \
 					       python3-dev \
 					       python3-pip \
 					       python3-numpy \
- && python3 -m pip install cookiecutter sphinx
+ && python3 -m pip install cookiecutter sphinx breathe sphinx_rtd_theme
 WORKDIR /builds
 RUN git clone https://github.com/Kitware/CMake.git -b v3.22.1 \
  && cd CMake && ./configure --prefix=/usr && make && make install
