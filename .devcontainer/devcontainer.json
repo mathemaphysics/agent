@@ -42,7 +42,8 @@
 		"isaias.doxygen-pack",
 		"gaborv.flatbuffers",
 		"hbenl.vscode-test-explorer",
-		"novaturion.cpp-classes-creator"
+		"novaturion.cpp-classes-creator",
+		"matepek.vscode-catch2-test-adapter"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
