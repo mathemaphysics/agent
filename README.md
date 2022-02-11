@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/mathemaphysics/agent/CI)](https://github.com/mathemaphysics/agent/actions?query=workflow%3ACI)
 [![PyPI Release](https://img.shields.io/pypi/v/agent.svg)](https://pypi.org/project/agent)
-[![Documentation Status](https://readthedocs.org/projects/agent/badge/)](https://agent.readthedocs.io/)
+[![Documentation Status](https://readthedocs.org/projects/agent-worker/badge/?version=latest)](https://agent-worker.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/mathemaphysics/agent/branch/main/graph/badge.svg)](https://codecov.io/gh/mathemaphysics/agent)
 
 # Introduction
