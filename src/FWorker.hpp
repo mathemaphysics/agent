@@ -15,10 +15,10 @@
 namespace agent
 {
 	typedef enum {
-		WORKER_READY,
-		WORKER_RUNNING,
-		WORKER_QUIT
-	} WorkerState;
+		FWORKER_READY,
+		FWORKER_RUNNING,
+		FWORKER_QUIT
+	} FWorkerState;
 
 	class FWorker
 	{
@@ -83,16 +83,16 @@ namespace agent
 		void SetName(std::string __name);
 
 		/**
-		 * @brief Gets the state of the worker, a \c WorkerState
+		 * @brief Gets the state of the worker, a \c FWorkerState
 		 * 
 		 * @return WorkerState State of the worker
 		 */
-		WorkerState GetState() const;
+		FWorkerState GetState() const;
 
 		/**
 		 * @brief Set the quit state
 		 * 
-		 * Sets the \c _state to \c WORKER_QUIT to kill the thread.
+		 * Sets the \c _state to \c FWORKER_QUIT to kill the thread.
 		 * 
 		 */
 		void SetQuit();
@@ -136,6 +136,6 @@ namespace agent
 	private:
 		unsigned int _id; ///< Unique ID of the worker
 		std::string _name = "IWorker"; ///< Name assigned to the worker
-		std::atomic<WorkerState> _state; ///< State of the worker; 0 -> Ready
+		std::atomic<FWorkerState> _state; ///< State of the worker; 0 -> Ready
 	};
 }

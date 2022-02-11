@@ -2,6 +2,7 @@
 #include "Worker.hpp"
 #include "IConnectionHandler.hpp"
 #include "AMQPWorker.hpp"
+#include "FWorker.hpp"
 #include "Message_generated.h"
 
 #include <thread>
@@ -28,6 +29,34 @@ protected:
   }
 
   Worker* worker;
+};
+
+class FWorkerTest : public ::testing::Test
+{
+public:
+  static int ProcessMessage(void* _msg, std::uint32_t)
+  {
+    auto msg = Messages::GetMessage(_msg);
+    auto id = msg->id();
+    auto height = msg->height();
+    auto width = msg->width();
+    auto pixels = msg->pixels()->Data();
+
+    return 0;
+  }
+protected:
+  void SetUp() override
+  {
+    worker = new FWorker(0, "WorkerTest", );
+    worker->Run(3);
+  }
+
+  void TearDown() override
+  {
+    delete worker;
+  }
+
+  FWorker* worker;
 };
 
 class AMQPWorkerTest : public ::testing::Test
@@ -102,10 +131,10 @@ TEST_F(WorkerTest, CreateWorker)
   EXPECT_EQ(1, 1);
 }
 
-//TEST_F(AMQPWorkerTest, CreateConnectionHandler)
-//{
-//  std::this_thread::sleep_for(std::chrono::seconds(2));
-//}
+TEST_F(AMQPWorkerTest, CreateConnectionHandler)
+{
+  std::this_thread::sleep_for(std::chrono::seconds(2));
+}
 
 TEST(add_one, sample)
 {

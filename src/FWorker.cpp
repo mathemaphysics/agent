@@ -17,7 +17,7 @@
 agent::FWorker::FWorker(unsigned int __id, std::function<int(const void*, std::uint32_t)> _msgproc)
 {
     _id = __id;
-    _state.store(WORKER_READY); ///< Sets the default to "ready"
+    _state.store(FWORKER_READY); ///< Sets the default to "ready"
 
     // Check if logger called GetName() exists, else create it
     _logger = spdlog::get(_name);
@@ -31,7 +31,7 @@ agent::FWorker::FWorker(unsigned int __id, std::string __name, std::function<int
 {
     _id = __id;
     _name = __name;
-    _state.store(WORKER_READY);
+    _state.store(FWORKER_READY);
 
     // Use the given name as name for _logger
     _logger = spdlog::get(__name);
@@ -60,14 +60,14 @@ agent::FWorker::~FWorker()
     _threads.clear();
 
     // Just to be pedantic
-    _state.store(WORKER_READY);
+    _state.store(FWORKER_READY);
 }
 
 void agent::FWorker::Run(std::size_t _nthread)
 {
     for (int tid = 0; tid < _nthread; ++tid)
         _threads.emplace_back(std::ref(*this));
-    _state.store(WORKER_RUNNING);
+    _state.store(FWORKER_RUNNING);
 }
 
 void agent::FWorker::Stop()
@@ -89,7 +89,7 @@ void agent::FWorker::Stop()
     _threads.clear();
 
     // Threads stopped; ready for another run
-    _state.store(WORKER_READY);
+    _state.store(FWORKER_READY);
 }
 
 unsigned int agent::FWorker::GetId() const
@@ -107,14 +107,14 @@ void agent::FWorker::SetName(std::string __name)
     _name = __name;
 }
 
-agent::WorkerState agent::FWorker::GetState() const
+agent::FWorkerState agent::FWorker::GetState() const
 {
     return _state.load();
 }
 
 void agent::FWorker::SetQuit()
 {
-    _state.store(WORKER_QUIT);
+    _state.store(FWORKER_QUIT);
 }
 
 void agent::FWorker::AddMessage(void *_msg, std::uint32_t _size)
@@ -126,7 +126,7 @@ void agent::FWorker::AddMessage(void *_msg, std::uint32_t _size)
 
 void agent::FWorker::operator()()
 {
-    while (GetState() != WORKER_QUIT)
+    while (GetState() != FWORKER_QUIT)
     {
         // Create space for a potential message
         bool received = false;
