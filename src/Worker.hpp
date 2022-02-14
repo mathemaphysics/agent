@@ -52,6 +52,6 @@ namespace agent
 		 * @param _size Number of bytes contained in the message
 		 * @return int ID of the message it processed
 		 */
-		int ProcessMessage(const void* _msg, std::uint32_t _size) const override;
+		int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr) const override;
 	};
 }

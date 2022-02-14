@@ -31,7 +31,7 @@ namespace agent
 		 * 
 		 * @param __id The ID number for this worker
 		 */
-		FWorker(unsigned int __id, std::function<int(const void*, std::uint32_t)> _msgproc);
+		FWorker(unsigned int __id, std::function<int(const void*, std::uint32_t, void*, std::uint32_t*)> _msgproc);
 
 		/**
 		 * @brief Construct a new IWorker object
@@ -39,7 +39,7 @@ namespace agent
 		 * @param __id Desired worker ID
 		 * @param __name Desired worker name
 		 */
-		FWorker(unsigned int __id, std::string __name, std::function<int(const void*, std::uint32_t)> _msgproc);
+		FWorker(unsigned int __id, std::string __name, std::function<int(const void*, std::uint32_t, void*, std::uint32_t*)> _msgproc);
 
 		/**
 		 * @brief Destroy the IWorker object
@@ -106,9 +106,10 @@ namespace agent
 		 * 
 		 * @param _msg Serialized message (array of bytes, i.e. void*)
 		 * @param _size Number of bytes in the serialized message in \c _msg
+		 * @param _result Output result that can be used by the caller
 		 * @return int Unique ID of the message processed
 		 */
-		std::function<int(const void*, std::uint32_t)> ProcessMessage;
+		std::function<int(const void*, std::uint32_t, void*, std::uint32_t*)> ProcessMessage;
 
 		/**
 		 * @brief Contains the main work loop

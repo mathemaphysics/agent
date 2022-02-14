@@ -34,7 +34,7 @@ protected:
 class FWorkerTest : public ::testing::Test
 {
 public:
-  static int ProcessMessage(const void* _msg, std::uint32_t)
+  static int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr)
   {
     auto msg = Messages::GetMessage(_msg);
     auto id = msg->id();

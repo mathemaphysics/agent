@@ -44,6 +44,6 @@ namespace agent
 			 * @param _size Size of the data
 			 * @return int The message ID processed
 			 */
-			int ProcessMessage(const void* _msg, std::uint32_t _size) const;
+			int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr) const;
 	};
 }

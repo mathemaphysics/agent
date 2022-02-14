@@ -194,7 +194,7 @@ namespace agent
 		 * @param _size Number of bytes in the serialized message in \c _msg
 		 * @return int Unique ID of the message processed
 		 */
-		virtual int ProcessMessage(const void* _msg, std::uint32_t _size) const = 0;
+		virtual int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr) const = 0;
 
 		/**
 		 * @brief Contains the main work loop

@@ -119,7 +119,7 @@ namespace agent
 		 * @param _size Size in bytes of the message data
 		 * @return int Tag or message ID processed (or anything you like)
 		 */
-		virtual int ProcessMessage(const void* _msg, std::uint32_t _size) const = 0;
+		virtual int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr) const = 0;
 
 	protected:
 		std::shared_ptr<spdlog::logger> _logger; ///< Exposing the logger for subclasses
