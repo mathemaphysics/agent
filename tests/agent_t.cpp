@@ -34,7 +34,7 @@ protected:
 class FWorkerTest : public ::testing::Test
 {
 public:
-  static int ProcessMessage(const void* _msg, std::uint32_t)
+  static int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr)
   {
     auto msg = Messages::GetMessage(_msg);
     auto id = msg->id();
@@ -187,10 +187,10 @@ TEST_F(FWorkerTest, CreateWorker)
   EXPECT_EQ(1, 1);
 }
 
-TEST_F(AMQPWorkerTest, CreateConnectionHandler)
-{
-  std::this_thread::sleep_for(std::chrono::seconds(2));
-}
+//TEST_F(AMQPWorkerTest, CreateConnectionHandler)
+//{
+//  std::this_thread::sleep_for(std::chrono::seconds(2));
+//}
 
 TEST(add_one, sample)
 {

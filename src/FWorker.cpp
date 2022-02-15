@@ -14,7 +14,7 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-agent::FWorker::FWorker(unsigned int __id, std::function<int(const void*, std::uint32_t)> _msgproc)
+agent::FWorker::FWorker(unsigned int __id, std::function<int(const void*, std::uint32_t, void*, std::uint32_t*)> _msgproc)
 {
     _id = __id;
     _state.store(FWORKER_READY); ///< Sets the default to "ready"
@@ -27,7 +27,7 @@ agent::FWorker::FWorker(unsigned int __id, std::function<int(const void*, std::u
     ProcessMessage = _msgproc;
 }
 
-agent::FWorker::FWorker(unsigned int __id, std::string __name, std::function<int(const void*, std::uint32_t)> _msgproc)
+agent::FWorker::FWorker(unsigned int __id, std::string __name, std::function<int(const void*, std::uint32_t, void*, std::uint32_t*)> _msgproc)
 {
     _id = __id;
     _name = __name;
@@ -130,7 +130,7 @@ void agent::FWorker::operator()()
     {
         // Create space for a potential message
         bool received = false;
-        std::pair<void *, std::uint32_t> curmsg;
+        std::pair<void*, std::uint32_t> curmsg;
 
         // Lock _data and grab a message
         _data_lock.lock();
@@ -150,7 +150,9 @@ void agent::FWorker::operator()()
             const auto size = curmsg.second;
             try
             {
-                int msgId = ProcessMessage(message, size);
+                auto result = new char[64];
+                std::uint32_t rsize;
+                int msgId = ProcessMessage(message, size, result, &rsize);
                 _logger->info("[{}] Successfully processed message {}",
                               ThreadToString(std::this_thread::get_id()),
                               msgId);

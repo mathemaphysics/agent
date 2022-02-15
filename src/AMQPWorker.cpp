@@ -17,7 +17,7 @@ agent::AMQPWorker::AMQPWorker(
 
 }
 
-int agent::AMQPWorker::ProcessMessage(const void* _msg, std::uint32_t _size) const
+int agent::AMQPWorker::ProcessMessage(const void* _msg, std::uint32_t _size, void* _result, std::uint32_t* _rsize) const
 {
     _logger->info("Received a message");
 

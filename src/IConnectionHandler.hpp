@@ -99,7 +99,7 @@ namespace agent
 		 * @param _size N/A
 		 * @return int N/A
 		 */
-		int ProcessMessage(const void* _msg, std::uint32_t _size) const = 0;
+		int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr) const = 0;
 
 		/**
 		 * @brief Function which runs the loop
