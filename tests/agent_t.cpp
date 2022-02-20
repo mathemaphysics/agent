@@ -73,6 +73,11 @@ public:
 	int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr) const override
   {
     _logger->info("Processed a message!");
+    auto msg = new char[128];
+    std::memcpy(msg, _msg, _size);
+    msg[_size] = '\0';
+    _logger->info("Payload:");
+    _logger->info(msg);
     return 0;
   }
 };

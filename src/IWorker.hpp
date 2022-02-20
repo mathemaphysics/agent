@@ -42,6 +42,7 @@ namespace agent
 			_logger = spdlog::get(_name);
 			if (_logger == nullptr)
 				_logger = spdlog::stdout_color_mt(_name);
+			_logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%t] %v");
 		}
 
 		/**
@@ -60,6 +61,7 @@ namespace agent
 			_logger = spdlog::get(__name);
 			if (_logger == nullptr)
 				_logger = spdlog::stdout_color_mt(__name);
+			_logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%t] %v");
 		}
 
 		/**
@@ -232,9 +234,7 @@ namespace agent
 					try
 					{
 						int msgId = ProcessMessage(message, size);
-						_logger->info("[{}] Successfully processed message {}",
-							ThreadToString(std::this_thread::get_id()),
-							msgId);
+						_logger->info("Successfully processed message {}", msgId);
 					}
 					catch(const std::exception& e)
 					{

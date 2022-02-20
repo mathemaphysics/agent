@@ -34,9 +34,7 @@ int agent::Worker::ProcessMessage(const void* _msg, std::uint32_t _size, void* _
     int height = message->height();
     auto pixels = message->pixels()->Data();
 
-    _logger->info("[{}] Received message: id: {} width: {} height: {}",
-        ThreadToString(std::this_thread::get_id()),
-        id, width, height);
+    _logger->info("Received message: id: {} width: {} height: {}", id, width, height);
 
     return id;
 }
