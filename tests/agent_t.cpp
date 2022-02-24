@@ -212,10 +212,10 @@ TEST_F(FWorkerTest, CreateWorker)
   EXPECT_EQ(1, 1);
 }
 
-TEST_F(AMQPWorkerTest, CreateConnectionHandler)
-{
-  std::this_thread::sleep_for(std::chrono::seconds(120));
-}
+//TEST_F(AMQPWorkerTest, CreateConnectionHandler)
+//{
+//  std::this_thread::sleep_for(std::chrono::seconds(120));
+//}
 
 TEST(add_one, sample)
 {

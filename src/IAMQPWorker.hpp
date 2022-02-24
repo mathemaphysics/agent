@@ -43,7 +43,7 @@ namespace agent
       		  _connection(this, _creds, _vhost),
       		  _channel(&_connection),
       		  _logger(nullptr),
-      		  IConnectionHandler(_id, _host, _port, _name) 
+      		  IConnectionHandler(_id, _host, _port, _name)
 		{
 			// Create the logger first
 			_logger = spdlog::get(GetName());
