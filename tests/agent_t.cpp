@@ -1,7 +1,7 @@
 #include "agent/agent.hpp"
 #include "Worker.hpp"
 #include "IConnectionHandler.hpp"
-#include "AMQPWorker.hpp"
+#include "IAMQPWorker.hpp"
 #include "FWorker.hpp"
 #include "Message_generated.h"
 
@@ -59,20 +59,45 @@ protected:
   FWorker* worker;
 };
 
+class AMQPProcessor : public IWorker
+{
+public:
+  AMQPProcessor(int __id)
+    : IWorker(__id)
+  {}
+
+  AMQPProcessor(int __id, std::string __name)
+    : IWorker(__id, __name)
+  {}
+
+	int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr) const override
+  {
+    _logger->info("Processed a message!");
+    auto msg = new char[128];
+    std::memcpy(msg, _msg, _size);
+    msg[_size] = '\0';
+    _logger->info("Payload:");
+    _logger->info(msg);
+    return 0;
+  }
+};
+
 class AMQPWorkerTest : public ::testing::Test
 {
 protected:
   void SetUp() override
   {
-    amqpWorker = new AMQPWorker(1, "rabbitmq", 5672, "AMQPWorker");
+    amqpProc = new AMQPProcessor(100, "AMQPProcessor");
+    amqpProc->Run(2);
+    amqpWorker = new IAMQPWorker(1, amqpProc, "rabbitmq", 5672, "AMQPWorker", "guest", "guest", "/");
   }
 
   void TearDown() override
   {
     //delete amqpWorker;
   }
-
-  AMQPWorker* amqpWorker;
+  AMQPProcessor* amqpProc;
+  IAMQPWorker* amqpWorker;
 };
 
 TEST_F(WorkerTest, CreateWorker)
@@ -189,7 +214,7 @@ TEST_F(FWorkerTest, CreateWorker)
 
 //TEST_F(AMQPWorkerTest, CreateConnectionHandler)
 //{
-//  std::this_thread::sleep_for(std::chrono::seconds(2));
+//  std::this_thread::sleep_for(std::chrono::seconds(120));
 //}
 
 TEST(add_one, sample)

@@ -42,6 +42,7 @@ namespace agent
 			_logger = spdlog::get(_name);
 			if (_logger == nullptr)
 				_logger = spdlog::stdout_color_mt(_name);
+			_logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%t] %v");
 		}
 
 		/**
@@ -60,6 +61,7 @@ namespace agent
 			_logger = spdlog::get(__name);
 			if (_logger == nullptr)
 				_logger = spdlog::stdout_color_mt(__name);
+			_logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%t] %v");
 		}
 
 		/**
@@ -178,10 +180,10 @@ namespace agent
 			_state.store(WORKER_QUIT);
 		}
 
-		void AddMessage(void* _msg, std::uint32_t _size)
+		void AddMessage(const void* _msg, std::uint32_t _size)
 		{
 			_data_lock.lock();
-			_data.push_front(std::pair<void*, std::uint32_t>(_msg, _size));
+			_data.push_front(std::pair<const void*, std::uint32_t>(_msg, _size));
 			_data_lock.unlock();
 		}
 
@@ -192,6 +194,8 @@ namespace agent
 		 * 
 		 * @param _msg Serialized message (array of bytes, i.e. void*)
 		 * @param _size Number of bytes in the serialized message in \c _msg
+		 * @param _result Result data serving as a return from the procedure
+		 * @param _rsize Size of the result message (optional)
 		 * @return int Unique ID of the message processed
 		 */
 		virtual int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr) const = 0;
@@ -209,7 +213,7 @@ namespace agent
 			{
 				// Create space for a potential message
 				bool received = false;
-				std::pair<void *, std::uint32_t> curmsg;
+				std::pair<const void *, std::uint32_t> curmsg;
 
 				// Lock _data and grab a message
 				_data_lock.lock();
@@ -230,9 +234,7 @@ namespace agent
 					try
 					{
 						int msgId = ProcessMessage(message, size);
-						_logger->info("[{}] Successfully processed message {}",
-							ThreadToString(std::this_thread::get_id()),
-							msgId);
+						_logger->info("Successfully processed message {}", msgId);
 					}
 					catch(const std::exception& e)
 					{
@@ -259,7 +261,7 @@ namespace agent
 		}
 
 	protected:
-		std::deque<std::pair<void*, std::uint32_t>> _data; ///< Queue of messages
+		std::deque<std::pair<const void*, std::uint32_t>> _data; ///< Queue of messages
 		std::mutex _data_lock; ///< Mutex lock for the \c _data queue
 		std::vector<std::thread> _threads; ///< All of the threads running on the worker
 		std::shared_ptr<spdlog::logger> _logger = nullptr;

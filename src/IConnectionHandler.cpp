@@ -147,6 +147,12 @@ void agent::IConnectionHandler::onClosed(AMQP::Connection *__connection)
   quit();
 }
 
+// This function should not exist at all; why can't I get rid of it?
+int agent::IConnectionHandler::ProcessMessage(const void*_msg, std::uint32_t _size, void*_result, std::uint32_t*_rsize) const
+{
+  return 0;
+}
+
 void agent::IConnectionHandler::operator()()
 {
   // This is the main worker loop for AMQP transactions
