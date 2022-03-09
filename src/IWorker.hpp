@@ -180,7 +180,7 @@ namespace agent
 			_state.store(WORKER_QUIT);
 		}
 
-		void AddMessage(const void* _msg, std::uint32_t _size)
+		virtual void AddMessage(const void* _msg, std::uint32_t _size)
 		{
 			_data_lock.lock();
 			_data.push_front(std::pair<const void*, std::uint32_t>(_msg, _size));
