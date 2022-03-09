@@ -124,7 +124,7 @@ namespace agent
 		 */
 		void AddMessage(const void* _msg, std::uint32_t _size, std::string _exchange = "", std::string _key = "")
 		{
-			_channel.publish(_exchange, _key, (char*)_msg, _size, 0);
+			_channel.publish(_exchange, _key, static_cast<const char*>(_msg), _size, 0);
 		}
 
 		/**
