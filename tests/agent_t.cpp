@@ -14,6 +14,47 @@
 
 using namespace agent;
 
+class BufferTest : public ::testing::Test
+{
+protected:
+  void SetUp() override
+  {
+    buffer = new Buffer();
+    buffer->Write(
+      testData.c_str(),
+      std::strlen(testData.c_str())
+    );
+  }
+
+  void TearDown() override
+  {
+    delete buffer;
+  }
+
+  Buffer *buffer;
+  const std::string testData = "Random test data";
+};
+
+class BufferShiftTests : public BufferTest, public ::testing::WithParamInterface<int>
+{
+
+};
+
+TEST_F(BufferTest, BufferAvailableCheck)
+{
+  EXPECT_EQ(buffer->Available(), testData.length());
+  EXPECT_STREQ(buffer->Data(), testData.c_str());
+}
+
+TEST_P(BufferShiftTests, BufferShiftCheck)
+{
+  std::size_t originalAvailable = buffer->Available();
+  buffer->Shift(GetParam());
+  EXPECT_EQ(buffer->Available(), originalAvailable - GetParam());
+}
+
+INSTANTIATE_TEST_SUITE_P(BufferShiftTestSuite, BufferShiftTests, ::testing::Values(1, 2, 3));
+
 class WorkerTest : public ::testing::Test
 {
 protected:
