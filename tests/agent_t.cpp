@@ -14,6 +14,11 @@
 
 using namespace agent;
 
+/**
+ * @brief Tests related to the Buffer class
+ * 
+ * Test the \c Buffer class operations.
+ */
 class BufferTest : public ::testing::Test
 {
 protected:
@@ -40,12 +45,6 @@ class BufferShiftTests : public BufferTest, public ::testing::WithParamInterface
 
 };
 
-TEST_F(BufferTest, BufferAvailableCheck)
-{
-  EXPECT_EQ(buffer->Available(), testData.length());
-  EXPECT_STREQ(buffer->Data(), testData.c_str());
-}
-
 TEST_P(BufferShiftTests, BufferShiftCheck)
 {
   std::size_t originalAvailable = buffer->Available();
@@ -53,8 +52,19 @@ TEST_P(BufferShiftTests, BufferShiftCheck)
   EXPECT_EQ(buffer->Available(), originalAvailable - GetParam());
 }
 
+TEST_F(BufferTest, BufferAvailableCheck)
+{
+  EXPECT_EQ(buffer->Available(), testData.length());
+  EXPECT_STREQ(buffer->Data(), testData.c_str());
+}
+
 INSTANTIATE_TEST_SUITE_P(BufferShiftTestSuite, BufferShiftTests, ::testing::Values(1, 2, 3));
 
+/**
+ * @brief Tests related to the \c IWorker class
+ * 
+ * Test the startup and execution of threaded workers
+ */
 class WorkerTest : public ::testing::Test
 {
 protected:
@@ -70,75 +80,6 @@ protected:
   }
 
   Worker* worker;
-};
-
-class FWorkerTest : public ::testing::Test
-{
-public:
-  static int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr)
-  {
-    auto msg = Messages::GetMessage(_msg);
-    auto id = msg->id();
-    auto height = msg->height();
-    auto width = msg->width();
-    auto pixels = msg->pixels()->Data();
-    
-    return 0;
-  }
-protected:
-  void SetUp() override
-  {
-    worker = new FWorker(0, "FWorkerTest", ProcessMessage);
-    worker->Run(3);
-  }
-
-  void TearDown() override
-  {
-    delete worker;
-  }
-
-  FWorker* worker;
-};
-
-class AMQPProcessor : public IWorker
-{
-public:
-  AMQPProcessor(int __id)
-    : IWorker(__id)
-  {}
-
-  AMQPProcessor(int __id, std::string __name)
-    : IWorker(__id, __name)
-  {}
-
-	int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr) const override
-  {
-    _logger->info("Processed a message!");
-    auto msg = new char[128];
-    std::memcpy(msg, _msg, _size);
-    msg[_size] = '\0';
-    _logger->info("Payload:");
-    _logger->info(msg);
-    return 0;
-  }
-};
-
-class AMQPWorkerTest : public ::testing::Test
-{
-protected:
-  void SetUp() override
-  {
-    amqpProc = new AMQPProcessor(100, "AMQPProcessor");
-    amqpProc->Run(2);
-    amqpWorker = new IAMQPWorker(1, amqpProc, "rabbitmq", 5672, "AMQPWorker", "guest", "guest", "/");
-  }
-
-  void TearDown() override
-  {
-    //delete amqpWorker;
-  }
-  AMQPProcessor* amqpProc;
-  IAMQPWorker* amqpWorker;
 };
 
 TEST_F(WorkerTest, CreateWorker)
@@ -197,6 +138,39 @@ TEST_F(WorkerTest, CreateWorker)
   EXPECT_EQ(1, 1);
 }
 
+/**
+ * @brief Tests related to \c FWorker
+ * 
+ * Test the startup and execution of threaded function worker
+ */
+class FWorkerTest : public ::testing::Test
+{
+public:
+  static int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr)
+  {
+    auto msg = Messages::GetMessage(_msg);
+    auto id = msg->id();
+    auto height = msg->height();
+    auto width = msg->width();
+    auto pixels = msg->pixels()->Data();
+    
+    return 0;
+  }
+protected:
+  void SetUp() override
+  {
+    worker = new FWorker(0, "FWorkerTest", ProcessMessage);
+    worker->Run(3);
+  }
+
+  void TearDown() override
+  {
+    delete worker;
+  }
+
+  FWorker* worker;
+};
+
 TEST_F(FWorkerTest, CreateWorker)
 {
   flatbuffers::FlatBufferBuilder builder(AGENT_FB_BUFFER_SIZE);
@@ -252,6 +226,54 @@ TEST_F(FWorkerTest, CreateWorker)
 
   EXPECT_EQ(1, 1);
 }
+
+/**
+ * @brief Tests related to \c IAMQPWorker
+ * 
+ * Test the startup and execution of threaded AMQP workers; main tests are with
+ * \c IAMQPWorker. IMPORTANT: These tests require an AMQP broker to be running
+ * on the localhost.
+ */
+class AMQPProcessor : public IWorker
+{
+public:
+  AMQPProcessor(int __id)
+    : IWorker(__id)
+  {}
+
+  AMQPProcessor(int __id, std::string __name)
+    : IWorker(__id, __name)
+  {}
+
+	int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr) const override
+  {
+    _logger->info("Processed a message!");
+    auto msg = new char[128];
+    std::memcpy(msg, _msg, _size);
+    msg[_size] = '\0';
+    _logger->info("Payload:");
+    _logger->info(msg);
+    return 0;
+  }
+};
+
+class AMQPWorkerTest : public ::testing::Test
+{
+protected:
+  void SetUp() override
+  {
+    amqpProc = new AMQPProcessor(100, "AMQPProcessor");
+    amqpProc->Run(2);
+    amqpWorker = new IAMQPWorker(1, amqpProc, "rabbitmq", 5672, "AMQPWorker", "guest", "guest", "/");
+  }
+
+  void TearDown() override
+  {
+    //delete amqpWorker;
+  }
+  AMQPProcessor* amqpProc;
+  IAMQPWorker* amqpWorker;
+};
 
 //TEST_F(AMQPWorkerTest, CreateConnectionHandler)
 //{
