@@ -115,6 +115,19 @@ namespace agent
 		}
 
 		/**
+		 * @brief Overridden version of \c AddMessage from \c IWorker which,
+		 * instead of adding to the local \c std::deque of message, adds the
+		 * message to the AMQP queue
+		 * 
+		 * @param _msg  Pointer to the message itself
+		 * @param _size Size of the message (in bytes)
+		 */
+		void AddMessage(const void* _msg, std::uint32_t _size, std::string _exchange = "", std::string _key = "")
+		{
+			_channel.publish(_exchange, _key, static_cast<const char*>(_msg), _size, 0);
+		}
+
+		/**
 		 * @brief Worker that runs a single message
 		 * 
 		 * The worker can be run with any number of threads, the idea being that
