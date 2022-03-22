@@ -58,6 +58,12 @@ TEST_F(BufferTest, BufferAvailableCheck)
   EXPECT_STREQ(buffer->Data(), testData.c_str());
 }
 
+TEST_F(BufferTest, BufferDrainCheck)
+{
+  buffer->Drain();
+  EXPECT_EQ(buffer->Available(), 0);
+}
+
 INSTANTIATE_TEST_SUITE_P(BufferShiftTestSuite, BufferShiftTests, ::testing::Values(1, 2, 3));
 
 /**
