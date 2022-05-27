@@ -2,13 +2,19 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.205.1/containers/cpp
 {
 	"name": "Agent Development",
-	"build": {
-		"dockerfile": "Dockerfile",
-		// Update 'VARIANT' to pick an Debian / Ubuntu OS version: debian-11, debian-10, debian-9, ubuntu-21.04, ubuntu-20.04, ubuntu-18.04
-		// Use Debian 11, Debian 9, Ubuntu 18.04 or Ubuntu 21.04 on local arm64/Apple Silicon
-		"args": { "DEVUSER": "devuser" }
-	},
-	"runArgs": ["--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined"],
+	//"build": {
+	//	"dockerfile": "Dockerfile",
+	//	// Update 'VARIANT' to pick an Debian / Ubuntu OS version: debian-11, debian-10, debian-9, ubuntu-21.04, ubuntu-20.04, ubuntu-18.04
+	//	// Use Debian 11, Debian 9, Ubuntu 18.04 or Ubuntu 21.04 on local arm64/Apple Silicon
+	//	"args": { "DEVUSER": "devuser" }
+	//},
+	"dockerComposeFile": "docker-compose.yml",
+	"runServices": [
+		"worker",
+		"broker"
+	],
+	"service": "worker",
+	"workspaceFolder": "/workspaces/agent",
 
 	// Set *default* container specific settings.json values on container create.
 	"settings": {},
@@ -58,8 +64,8 @@
 		"git": "os-provided"
 	},
 
-	// Maps the .ssh/ folder from your ${HOME} into /home/devuser/.ssh
-	"mounts": [
-		"source=${localEnv:HOME}/.ssh,target=/home/devuser/.ssh,type=bind,consistency=cached"
-	]
+	//// Maps the .ssh/ folder from your ${HOME} into /home/devuser/.ssh
+	//"mounts": [
+	//	"source=${localEnv:HOME}/.ssh,target=/home/devuser/.ssh,type=bind,consistency=cached"
+	//]
 }

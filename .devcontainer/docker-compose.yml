@@ -1,0 +1,29 @@
+services:
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DEVUSER: ${DEVUSER}
+    depends_on:
+      - broker
+    networks:
+      - agent_network
+    volumes:
+      - ${REPOSDIR}/agent:${WORKSPACEDIR}/agent
+      - build_volume:${WORKSPACEDIR}/agent/build
+      - ${HOME}/.ssh:/home/${DEVUSER}/.ssh
+    command: ["sleep", "infinity"]
+
+  broker:
+    image: rabbitmq:3-management
+    networks:
+      - agent_network
+
+networks:
+  agent_network:
+
+volumes:
+  build_volume:
+
