@@ -62,7 +62,7 @@
 	"remoteUser": "devuser",
 	"features": {
 		"git": "os-provided"
-	},
+	}
 
 	//// Maps the .ssh/ folder from your ${HOME} into /home/devuser/.ssh
 	//"mounts": [
