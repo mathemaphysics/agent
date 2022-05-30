@@ -121,6 +121,11 @@ install(
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
+install(
+  DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
 # This prints a summary of found dependencies
 include(FeatureSummary)
 feature_summary(WHAT ALL)
