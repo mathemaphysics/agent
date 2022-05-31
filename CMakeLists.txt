@@ -22,7 +22,8 @@ set(AGENT_CONN_TEMP_BUFFER_SIZE "8*1024*1024")
 
 configure_file(include/agent/agent_config.hpp.in include/agent/agent_config.hpp)
 
-include_directories(${CMAKE_BINARY_DIR}/include)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 include(FetchContent)
 
