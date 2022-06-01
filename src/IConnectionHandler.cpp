@@ -64,10 +64,38 @@ agent::IConnectionHandler::IConnectionHandler(
   _socket.setKeepAlive(true);
 }
 
-void agent::IConnectionHandler::onProperties(AMQP::Connection *__connection, const AMQP::Table &_server, AMQP::Table &_client)
+void agent::IConnectionHandler::onProperties(AMQP::Connection *__connection, const AMQP::Table &_server, AMQP::Table &__client)
 {
   if (_connection == nullptr)
     _connection = __connection;
+
+  // Make sure we know who you are
+  __client["connection_name"] = _client;
+
+  // Set the platform
+  #if defined(__linux__)
+  __client["platform"] = "Linux";
+  #elif defined(__APPLE__)
+  __client["platform"] = "Mac OS X";
+  #elif defined(__sun)
+  __client["platform"] = "Solaris";
+  #elif defined(__FreeBSD__)
+  __client["platform"] = "FreeBSD";
+  #elif defined(__OpenBSD__)
+  __client["platform"] = "OpenBSD";
+  #elif defined(__NetBSD__)
+  __client["platform"] = "NetBSD";
+  #elif defined(__hpux)
+  __client["platform"] = "HP-UX";
+  #elif defined(__osf__)
+  __client["platform"] = "Tru64 UNIX";
+  #elif defined(__sgi)
+  __client["platform"] = "Irix";
+  #elif defined(_AIX)
+  __client["platform"] = "AIX";
+  #elif defined(_WIN32)
+  __client["platform"] = "Windows";
+  #endif
 
   // Print details of the client and server
   auto _clientss = std::ostringstream();

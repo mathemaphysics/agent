@@ -270,7 +270,7 @@ protected:
   {
     amqpProc = new AMQPProcessor(100, "AMQPProcessor");
     amqpProc->Run(2);
-    amqpWorker = new IAMQPWorker(1, amqpProc, "rabbitmq", 5672, "AMQPWorker", "guest", "guest", "/");
+    amqpWorker = new IAMQPWorker(1, amqpProc, "broker", 5672, "AMQPWorker", "guest", "guest", "/");
   }
 
   void TearDown() override
