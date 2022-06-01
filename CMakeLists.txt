@@ -109,12 +109,7 @@ install(
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-)
-
-install(
-  EXPORT agent-config
-  NAMESPACE agent::
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/agent
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INLUDEDIR}/agent
 )
 
 install(
@@ -125,6 +120,14 @@ install(
 install(
   DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+
+
+install(
+  EXPORT agent-config
+  NAMESPACE agent::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/agent
 )
 
 # This prints a summary of found dependencies

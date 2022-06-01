@@ -9,4 +9,5 @@ target_include_directories(agent PUBLIC
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   $<BUILD_INTERFACE:${AMQPCPP_INCLUDE_DIR}>
 )
+
 target_link_libraries(agent flatbuffers spdlog::spdlog amqpcpp Poco::Net)
