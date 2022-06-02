@@ -40,9 +40,17 @@ agent::IConnectionHandler::IConnectionHandler(
     unsigned int _id,
     const std::string& _host,
     std::uint16_t _port,
-    const std::string& _name
+    const std::string& _name,
+    const std::string& __product,
+    const std::string& __version,
+    const std::string& __copyright,
+    const std::string& __information
   )
     : _client(_name),
+      _product(__product),
+      _version(__version),
+      _copyright(__copyright),
+      _information(__information),
       _connected(false),
       _connection(nullptr),
       _inpbuffer(AGENT_CONN_BUFFER_SIZE),
@@ -71,6 +79,10 @@ void agent::IConnectionHandler::onProperties(AMQP::Connection *__connection, con
 
   // Make sure we know who you are
   __client["connection_name"] = _client;
+  __client["product"] = _product;
+  __client["version"] = _version;
+  __client["copyright"] = _copyright;
+  __client["information"] = _information;
 
   // Set the platform
   #if defined(__linux__)

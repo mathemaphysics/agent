@@ -26,7 +26,7 @@ namespace agent
 		 * @param _name Client name to assign the consumer
 		 * @param _logname Name to give the logger
 		 */
-		IConnectionHandler(unsigned int __id, const std::string& _host, std::uint16_t _port, const std::string& _name);
+		IConnectionHandler(unsigned int __id, const std::string& _host, std::uint16_t _port, const std::string& _name, const std::string& __product = "", const std::string& __version = "", const std::string& __copyright = "", const std::string& __information = "");
 
 		/**
 		 * @brief Destroy the Connection Handler object
@@ -119,6 +119,10 @@ namespace agent
 	private:
 		void _connectSocket(Poco::Net::SocketAddress _address);
 		std::string _client;
+		std::string _product;
+		std::string _version;
+		std::string _copyright;
+		std::string _information;
 		bool _connected;
 		Poco::Net::StreamSocket _socket;
 		const Poco::Net::SocketAddress _address;
