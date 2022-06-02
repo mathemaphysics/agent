@@ -270,7 +270,7 @@ protected:
   {
     amqpProc = new AMQPProcessor(100, "AMQPProcessor");
     amqpProc->Run(2);
-    amqpWorker = new IAMQPWorker(1, amqpProc, "broker", 5672, "AMQPWorker", "guest", "guest", "/");
+    amqpWorker = new IAMQPWorker(1, amqpProc, "broker", 5672, "guest", "guest", "/", "AMQPWorker", "TestCode", "0.0.1", "Copyright 2022 Mathemaphysics Inc", "https://github.org/mathemaphysics/agent.git");
   }
 
   void TearDown() override
@@ -281,10 +281,10 @@ protected:
   IAMQPWorker* amqpWorker;
 };
 
-//TEST_F(AMQPWorkerTest, CreateConnectionHandler)
-//{
-//  std::this_thread::sleep_for(std::chrono::seconds(120));
-//}
+TEST_F(AMQPWorkerTest, CreateConnectionHandler)
+{
+  std::this_thread::sleep_for(std::chrono::seconds(120));
+}
 
 TEST(add_one, sample)
 {

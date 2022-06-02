@@ -30,20 +30,32 @@ namespace agent
 		 */
 		IAMQPWorker(
 			unsigned int _id,
-			IWorker* _iworker,
+			IWorker *_iworker,
 			std::string _host,
 			std::uint16_t _port,
-			std::string _name,
-			std::string _user = "guest",
-			std::string _pass = "guest",
-			std::string _vhost = "/"
-		)
+			const std::string &_user = "guest",
+			const std::string &_pass = "guest",
+			const std::string &_vhost = "/",
+			const std::string &_name = "",
+			const std::string &__product = "",
+			const std::string &__version = "",
+			const std::string &__copyright = "",
+			const std::string &__information = "")
 			: _worker(_iworker),
 			  _creds(_user, _pass),
-      		  _connection(this, _creds, _vhost),
-      		  _channel(&_connection),
-      		  _logger(nullptr),
-      		  IConnectionHandler(_id, _host, _port, _name)
+			  _connection(this, _creds, _vhost),
+			  _channel(&_connection),
+			  _logger(nullptr),
+			  IConnectionHandler(
+				  _id,
+				  _host,
+				  _port,
+				  _name,
+				  __product,
+				  __version,
+				  __copyright,
+				  __information
+			  )
 		{
 			// Create the logger first
 			_logger = spdlog::get(GetName());
