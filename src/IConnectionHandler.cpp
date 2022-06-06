@@ -149,7 +149,7 @@ void agent::IConnectionHandler::onHeartbeat(AMQP::Connection *__connection)
     _connection = __connection;
 
   // Announce that we received a heartbeat from the AMQP server
-  _logger->info("[onHeartbeat] Received a heartbeat from server");
+  _logger->debug("[onHeartbeat] Received a heartbeat from server");
 
   // Send a return heartbeat; this isn't ideal because it depends on receiving a
   // heartbeat first, which might not happen. Set up an independent thread that
