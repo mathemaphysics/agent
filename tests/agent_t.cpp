@@ -281,10 +281,10 @@ protected:
   IAMQPWorker* amqpWorker;
 };
 
-TEST_F(AMQPWorkerTest, CreateConnectionHandler)
-{
-  std::this_thread::sleep_for(std::chrono::seconds(120));
-}
+//TEST_F(AMQPWorkerTest, CreateConnectionHandler)
+//{
+//  std::this_thread::sleep_for(std::chrono::seconds(120));
+//}
 
 TEST(add_one, sample)
 {
