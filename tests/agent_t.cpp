@@ -270,7 +270,7 @@ protected:
   {
     amqpProc = new AMQPProcessor(100, "AMQPProcessor");
     amqpProc->Run(2);
-    amqpWorker = new IAMQPWorker(1, amqpProc, "broker", 5672, "guest", "guest", "/", "AMQPWorker", "AnotherQueue", "Exchange", "Queue", "TestCode", "0.0.1", "Copyright 2022 Mathemaphysics Inc", "https://github.org/mathemaphysics/agent.git");
+    amqpWorker = new IAMQPWorker(1, amqpProc, "broker", 5672, "guest", "guest", "/", "AMQPWorker", "AnotherQueue", "Exchange", "AnotherQueue", "TestCode", "0.0.1", "Copyright 2022 Mathemaphysics Inc", "https://github.org/mathemaphysics/agent.git");
   }
 
   void TearDown() override
