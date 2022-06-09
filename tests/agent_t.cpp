@@ -7,6 +7,8 @@
 
 #include <thread>
 #include <chrono>
+#include <fstream>
+#include <stdexcept>
 
 #include <gtest/gtest.h>
 #include <spdlog/spdlog.h>
@@ -268,9 +270,25 @@ class AMQPWorkerTest : public ::testing::Test
 protected:
   void SetUp() override
   {
+    Json::Value jsonConfig;
+    Json::CharReaderBuilder builder;
+    builder["collectComments"] = false;
+    Json::String errs;
+    auto ssConfig = std::ifstream("client.json");
+    try
+    {
+      Json::parseFromStream(builder, ssConfig, &jsonConfig, &errs);
+    }
+    catch (const Json::Exception& e)
+    {
+      std::cerr << "JSON Error: " << e.what() << std::endl;
+    }
+
     amqpProc = new AMQPProcessor(100, "AMQPProcessor");
     amqpProc->Run(2);
-    amqpWorker = new IAMQPWorker(1, amqpProc, "broker", 5672, "guest", "guest", "/", "AMQPWorker", "AnotherQueue", "Exchange", "AnotherQueue", "TestCode", "0.0.1", "Copyright 2022 Mathemaphysics Inc", "https://github.org/mathemaphysics/agent.git");
+    //amqpWorker = new IAMQPWorker(1, amqpProc, "broker", 5672, "guest", "guest", "/", "AMQPWorker", "AnotherQueue", "Exchange", "AnotherQueue", AMQP::autodelete, AMQP::autodelete, 4, AMQP::ExchangeType::direct, "TestCode", "0.0.1", "Copyright 2022 Mathemaphysics Inc", "https://github.org/mathemaphysics/agent.git");
+
+    amqpWorker = new IAMQPWorker(1, amqpProc, jsonConfig);
   }
 
   void TearDown() override

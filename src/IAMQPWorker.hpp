@@ -5,9 +5,13 @@
 
 #include <string>
 #include <cstdint>
+#include <algorithm>
 
 #include <amqpcpp.h>
+#include <json/json.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+
+#include "SymbolMaps.hpp"
 
 namespace agent
 {
@@ -23,10 +27,20 @@ namespace agent
 		 * @param _iworker Pointer to the worker who knows how to process a message
 		 * @param _host Host address to connect to
 		 * @param _port AMQP port
-		 * @param _name Name of client to report
 		 * @param _user AMQP user
 		 * @param _pass AMQP password
 		 * @param _vhost AMQP virtual host to use
+		 * @param _name Name of client to report
+		 * @param __queue Name of the queue
+		 * @param __exchange Name of the exchange
+		 * @param __key Key to use for this exchange
+		 * @param __queueFlags Flags determining queue behavior
+		 * @param __prefetch Number of messages to prefetch
+		 * @param __exchangeType What kind of exchange this is
+		 * @param __product Name of the product (AMQP client field)
+		 * @param __version Version of produce (AMQP client field)
+		 * @param __copyright Copyright notice (AMQP client field)
+		 * @param __information Information (AMQP client field)
 		 */
 		IAMQPWorker(
 			unsigned int _id,
@@ -40,6 +54,10 @@ namespace agent
 			const std::string &__queue = "Queue",
 			const std::string &__exchange = "Exchange",
 			const std::string &__key = "Queue",
+			const int __queueFlags = 0,
+			const int __exchangeFlags = 0,
+			std::uint32_t __prefetch = 4,
+			AMQP::ExchangeType __exchangeType = AMQP::ExchangeType::fanout,
 			const std::string &__product = "",
 			const std::string &__version = "",
 			const std::string &__copyright = "",
@@ -52,6 +70,10 @@ namespace agent
 			  _queue(__queue),
 			  _exchange(__exchange),
 			  _key(__key),
+			  _queueFlags(__queueFlags),
+			  _exchangeFlags(__exchangeFlags),
+			  _prefetch(__prefetch),
+			  _exchangeType(__exchangeType),
 			  IConnectionHandler(
 				  _id,
 				  _host,
@@ -61,6 +83,76 @@ namespace agent
 				  __version,
 				  __copyright,
 				  __information
+			  )
+		{
+			// Create the logger first
+			_logger = spdlog::get(GetName());
+			if (_logger == nullptr)
+				_logger = spdlog::stdout_color_mt(GetName());
+
+			// Declare the queue and exchange and bind them
+			InitializeQueue();
+
+			// Set the worker callbacks
+			SetConsumerCallbacks();
+
+			// Start the threads
+			try
+			{
+				Run();
+			}
+			catch(const std::exception& e)
+			{
+				_logger->error("Exception caught: {}", e.what());
+			}
+			catch(...)
+			{
+				_logger->error("Anonymous exception caught");
+			}
+		}
+
+		IAMQPWorker(
+			unsigned int _id,
+			IWorker *_iworker,
+			Json::Value _config)
+			: _worker(_iworker),
+			  _creds(
+				  _config["credentials"]["username"].asString(),
+				  _config["credentials"]["password"].asString()
+			  ),
+			  _connection(
+				  this,
+				  _creds,
+				  _config["host"]["vhost"].asString()
+			  ),
+			  _channel(&_connection),
+			  _logger(nullptr),
+			  _queue(_config["settings"]["queue"].asString()),
+			  _exchange(_config["settings"]["exchange"].asString()),
+			  _key(_config["settings"]["key"].asString()),
+			  _queueFlags([_config](){
+				int total = 0;
+				for (auto flag : _config["settings"]["queueFlags"])
+					total |= allBitFlags[flag.asString()];
+				return total;
+			  }()),
+			  _exchangeFlags([_config](){
+				int total = 0;
+				for (auto flag : _config["settings"]["exchangeFlags"])
+					total |= allBitFlags[flag.asString()];
+				return total;
+			  }()),
+			  _prefetch(_config["settings"]["prefetch"].asUInt()),
+			  _exchangeType(exchangeTypeMap[_config["settings"]["exchangeType"].asString()]),
+			  IConnectionHandler(
+				  _id,
+				  _config["host"]["host"].asString(),
+				  _config["host"]["port"].asUInt(),
+				  _config["name"].asString(),
+				  _config["information"]["product"].asString(),
+				  _config["information"]["version"].asString(),
+				  _config["information"]["copyright"].asString(),
+				  _config["information"]["information"].asString()
 			  )
 		{
 			// Create the logger first
@@ -100,9 +192,10 @@ namespace agent
 		 */
 		void InitializeQueue()
 		{
-			_channel.declareQueue(_queue, AMQP::durable);
-			_channel.declareExchange(_exchange);
+			_channel.declareQueue(_queue, _queueFlags);
+			_channel.declareExchange(_exchange, _exchangeType, _exchangeFlags);
 			_channel.bindQueue(_exchange, _queue, _key);
+			_channel.setQos(_prefetch);
 		}
 
 		/**
@@ -175,5 +268,12 @@ namespace agent
 		std::string _queue = "Queue"; ///< The queue to pull messages from
 		std::string _exchange = "Exchange"; ///< The exchange to bind it to
 		std::string _key = "Queue"; ///< The optional key
+
+		/* New way of storing exchange and queue configuration flags */
+		const int _queueFlags = 0;
+		const int _exchangeFlags = 0;
+		std::uint16_t _prefetch = 4; ///< The number of messages to prefetch
+		AMQP::ExchangeType _exchangeType = AMQP::ExchangeType::fanout;
+		const int _eventLoopFlags = 0;
 	};
 }
