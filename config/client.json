@@ -1,0 +1,35 @@
+{
+    "name": "ClientName",
+    "host":
+    {
+        "host": "broker",
+        "port": 5672,
+        "vhost": "/"
+    },
+    "credentials":
+    {
+        "username": "guest",
+        "password": "guest"
+    },
+    "settings":
+    {
+        "queue": "queueName3",
+        "exchange": "exchangeName3",
+        "key": "queueName3",
+        "prefetch": 4,
+        "queueFlags": [
+            "autodelete"
+        ],
+        "exchangeFlags": [
+            "autodelete"
+        ],
+        "exchangeType": "direct"
+    },
+    "information":
+    {
+        "product": "Product Name",
+        "version": "1.0.0",
+        "copyright": "Copyright 2022 Product Name",
+        "information": "https://nowhere.net.bye"
+    }
+}

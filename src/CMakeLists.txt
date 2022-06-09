@@ -10,4 +10,4 @@ target_include_directories(agent PUBLIC
   $<BUILD_INTERFACE:${AMQPCPP_INCLUDE_DIR}>
 )
 
-target_link_libraries(agent flatbuffers spdlog::spdlog amqpcpp Poco::Net)
+target_link_libraries(agent flatbuffers spdlog::spdlog amqpcpp Poco::Net jsoncpp_lib)
