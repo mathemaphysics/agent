@@ -253,7 +253,7 @@ public:
     : IWorker(__id, __name)
   {}
 
-	int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr) const override
+	int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr) override
   {
     _logger->info("Processed a message!");
     auto msg = new char[128];

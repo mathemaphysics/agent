@@ -188,7 +188,7 @@ void agent::IConnectionHandler::onClosed(AMQP::Connection *__connection)
 }
 
 // This function should not exist at all; why can't I get rid of it?
-int agent::IConnectionHandler::ProcessMessage(const void*_msg, std::uint32_t _size, void*_result, std::uint32_t*_rsize) const
+int agent::IConnectionHandler::ProcessMessage(const void*_msg, std::uint32_t _size, void*_result, std::uint32_t*_rsize)
 {
   return 0;
 }

@@ -26,7 +26,7 @@ agent::Worker::~Worker()
     _logger->info("Worker {} finished", GetId());
 }
 
-int agent::Worker::ProcessMessage(const void* _msg, std::uint32_t _size, void* _result, std::uint32_t* _rsize) const
+int agent::Worker::ProcessMessage(const void* _msg, std::uint32_t _size, void* _result, std::uint32_t* _rsize)
 {
     auto message = Messages::GetMessage(_msg);
     int id = message->id();

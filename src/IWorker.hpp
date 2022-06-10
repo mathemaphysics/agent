@@ -198,7 +198,7 @@ namespace agent
 		 * @param _rsize Size of the result message (optional)
 		 * @return int Unique ID of the message processed
 		 */
-		virtual int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr) const = 0;
+		virtual int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr) = 0;
 
 		/**
 		 * @brief Contains the main work loop
