@@ -23,7 +23,7 @@ agent::FWorker::FWorker(unsigned int __id, std::function<int(const void*, std::u
     _logger = spdlog::get(_name);
     if (_logger == nullptr)
         _logger = spdlog::stdout_color_mt(_name);
-	_logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%t] %v");
+	_logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%^%l%$] [%t] %v");
 
     ProcessMessage = _msgproc;
 }
@@ -38,7 +38,7 @@ agent::FWorker::FWorker(unsigned int __id, std::string __name, std::function<int
     _logger = spdlog::get(__name);
     if (_logger == nullptr)
         _logger = spdlog::stdout_color_mt(__name);
-	_logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] [%t] %v");
+	_logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%^%l%$] [%t] %v");
 
     ProcessMessage = _msgproc;
 }
