@@ -283,7 +283,7 @@ protected:
     {
       std::cerr << "JSON Error: " << e.what() << std::endl;
     }
-
+    spdlog::set_level(spdlog::level::debug);
     amqpProc = new AMQPProcessor(100, "AMQPProcessor");
     amqpProc->Run(2);
     //amqpWorker = new IAMQPWorker(1, amqpProc, "broker", 5672, "guest", "guest", "/", "AMQPWorker", "AnotherQueue", "Exchange", "AnotherQueue", AMQP::autodelete, AMQP::autodelete, 4, AMQP::ExchangeType::direct, "TestCode", "0.0.1", "Copyright 2022 Mathemaphysics Inc", "https://github.org/mathemaphysics/agent.git");

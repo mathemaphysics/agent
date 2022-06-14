@@ -140,7 +140,7 @@ void agent::IConnectionHandler::onData(AMQP::Connection *__connection, const cha
   _socket.sendBytes(_data, _size);
 
   // TODO: Maybe make this debug level?
-  _logger->info("[onData] Sent {} bytes", _size);
+  _logger->debug("[onData] Sent {} bytes", _size);
 }
 
 void agent::IConnectionHandler::onHeartbeat(AMQP::Connection *__connection)
@@ -163,7 +163,7 @@ void agent::IConnectionHandler::onError(AMQP::Connection *__connection, const ch
     _connection = __connection;
 
   // Announce that we received a heartbeat from the AMQP server
-  _logger->info("[onError] Error: {}", _message);
+  _logger->error("[onError] Error: {}", _message);
 }
 
 void agent::IConnectionHandler::onReady(AMQP::Connection *__connection)
