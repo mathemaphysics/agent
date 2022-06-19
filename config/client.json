@@ -9,7 +9,10 @@
     "credentials":
     {
         "username": "guest",
-        "password": "guest"
+        "password": "guest",
+        "privateKeyFile": "",
+        "certificateFile": "",
+        "caLocation": ""
     },
     "settings":
     {
