@@ -12,12 +12,26 @@
 #include <vector>
 #include <cstdint>
 
+class SSLInitializer
+{
+public:
+	SSLInitializer()
+	{
+		Poco::Net::initializeSSL();
+	}
+
+	~SSLInitializer()
+	{
+		Poco::Net::uninitializeSSL();
+	}
+};
+
 namespace agent
 {
 	class IConnectionHandlerSSL : public AMQP::ConnectionHandler, public IWorker
 	{
 	public:
-		IConnectionHandlerSSL(unsigned int __id, const Poco::Net::Context& __context);
+		IConnectionHandlerSSL(unsigned int __id, Poco::Net::Context::Ptr __context);
 
 		/**
 		 * @brief Construct a new connection potentially with SSL
@@ -32,7 +46,7 @@ namespace agent
 		 * @param __copyright 
 		 * @param __information 
 		 */
-		IConnectionHandlerSSL(unsigned int __id, const std::string& _host, std::uint16_t _port, const std::string& _name, const Poco::Net::Context& __context, const std::string& __product = "", const std::string& __version = "", const std::string& __copyright = "", const std::string& __information = "");
+		IConnectionHandlerSSL(unsigned int __id, const std::string& _host, std::uint16_t _port, const std::string& _name, Poco::Net::Context::Ptr __context, const std::string& __product = "", const std::string& __version = "", const std::string& __copyright = "", const std::string& __information = "");
 
 		/**
 		 * @brief Destroy the Connection Handler object
@@ -131,12 +145,13 @@ namespace agent
 		std::string _information;
 		bool _connected;
 		Poco::Net::SecureStreamSocket _socket;
-		const Poco::Net::Context& _context;
+		Poco::Net::Context::Ptr _context;
 		const Poco::Net::SocketAddress _address;
 		AMQP::Connection* _connection;
 		Buffer _inpbuffer;
 		Buffer _outbuffer;
 		std::vector<char> _tmpbuffer;
 		void _sendDataFromBuffer();
+		SSLInitializer sslInitializer;
 	};
 }

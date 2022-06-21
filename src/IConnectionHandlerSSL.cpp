@@ -11,18 +11,24 @@
 #include <amqpcpp.h>
 #include <spdlog/spdlog.h>
 #include <Poco/Net/SecureStreamSocket.h>
+#include <Poco/Net/SSLManager.h>
 #include <Poco/Crypto/X509Certificate.h>
 #include <Poco/Net/Context.h>
+#include "Poco/Net/ConsoleCertificateHandler.h"
+#include "Poco/SharedPtr.h"
+#include "Poco/Exception.h"
+#include "Poco/URI.h"
 
-agent::IConnectionHandlerSSL::IConnectionHandlerSSL(unsigned int _id, const Poco::Net::Context& __context)
-    : _client("IConnectionHandler"), // Default client name
+agent::IConnectionHandlerSSL::IConnectionHandlerSSL(unsigned int _id, Poco::Net::Context::Ptr __context)
+    : _client("IConnectionHandlerSSL"), // Default client name
       _connected(false),
       _connection(nullptr),
       _inpbuffer(AGENT_CONN_BUFFER_SIZE),
       _tmpbuffer(AGENT_CONN_TEMP_BUFFER_SIZE),
       _outbuffer(AGENT_CONN_BUFFER_SIZE),
-      _address(Poco::Net::SocketAddress("localhost", 5672)),
+      _address(Poco::Net::SocketAddress("localhost", 5671)),
       _context(__context),
+      _socket(__context),
       _logger(nullptr), // Default no logger
       IWorker(_id)
 {
@@ -34,9 +40,10 @@ agent::IConnectionHandlerSSL::IConnectionHandlerSSL(unsigned int _id, const Poco
   // Just announce the creation of the client; can turn this off via log level
   _logger->info("Client {} created", _client);
 
+  //Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrCert = new Poco::Net::ConsoleCertificateHandler(false);
+  //Poco::Net::SSLManager::instance().initializeClient(0, ptrCert, _context);
+
   // Set up the AMQP::Connection here and then Run()
-  // Set up context here
-  //_context.addCertificateAuthority(Poco::Crypto::X509Certificate(std::string("certauth.crt")));
   _socket.connect(_address);
   _socket.setKeepAlive(true);
 }
@@ -46,7 +53,7 @@ agent::IConnectionHandlerSSL::IConnectionHandlerSSL(
     const std::string& _host,
     std::uint16_t _port,
     const std::string& _name,
-    const Poco::Net::Context& __context,
+    Poco::Net::Context::Ptr __context,
     const std::string& __product,
     const std::string& __version,
     const std::string& __copyright,
@@ -54,6 +61,7 @@ agent::IConnectionHandlerSSL::IConnectionHandlerSSL(
   )
     : _client(_name),
       _context(__context),
+      _socket(__context),
       _product(__product),
       _version(__version),
       _copyright(__copyright),
@@ -64,7 +72,8 @@ agent::IConnectionHandlerSSL::IConnectionHandlerSSL(
       _tmpbuffer(AGENT_CONN_TEMP_BUFFER_SIZE),
       _outbuffer(AGENT_CONN_BUFFER_SIZE),
       _address(Poco::Net::SocketAddress(_host, _port)),
-      IWorker(_id, _name)
+      IWorker(_id, _name),
+      sslInitializer()
 {
   // Check if logger called GetName() exists, else create it
   _logger = spdlog::get(_client);
@@ -73,6 +82,9 @@ agent::IConnectionHandlerSSL::IConnectionHandlerSSL(
   
   // Just announce the creation of the client; can turn this off via log level
   _logger->info("Client {} created", _client);
+
+  Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrCert = new Poco::Net::ConsoleCertificateHandler(false);
+  Poco::Net::SSLManager::instance().initializeClient(0, ptrCert, _context);
 
   // Set up the AMQP::Connection here and then Run()
   _socket.connect(_address);

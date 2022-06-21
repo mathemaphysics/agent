@@ -2,6 +2,7 @@
 #include "Worker.hpp"
 #include "IConnectionHandler.hpp"
 #include "IAMQPWorker.hpp"
+#include "IAMQPWorkerSSL.hpp"
 #include "FWorker.hpp"
 #include "Message_generated.h"
 
@@ -274,7 +275,7 @@ protected:
     Json::CharReaderBuilder builder;
     builder["collectComments"] = false;
     Json::String errs;
-    auto ssConfig = std::ifstream("client.json");
+    auto ssConfig = std::ifstream("/workspaces/agent/config/client.json");
     try
     {
       Json::parseFromStream(builder, ssConfig, &jsonConfig, &errs);
@@ -283,12 +284,23 @@ protected:
     {
       std::cerr << "JSON Error: " << e.what() << std::endl;
     }
+    std::cout << jsonConfig << std::endl;
     spdlog::set_level(spdlog::level::debug);
     amqpProc = new AMQPProcessor(100, "AMQPProcessor");
-    amqpProc->Run(2);
+    amqpProc->Run(1);
     //amqpWorker = new IAMQPWorker(1, amqpProc, "broker", 5672, "guest", "guest", "/", "AMQPWorker", "AnotherQueue", "Exchange", "AnotherQueue", AMQP::autodelete, AMQP::autodelete, 4, AMQP::ExchangeType::direct, "TestCode", "0.0.1", "Copyright 2022 Mathemaphysics Inc", "https://github.org/mathemaphysics/agent.git");
 
-    amqpWorker = new IAMQPWorker(1, amqpProc, jsonConfig);
+    try
+    {
+      amqpWorker = new IAMQPWorkerSSL(1, amqpProc, jsonConfig);
+    }
+    catch (const Poco::Exception& e)
+    {
+      std::cout << "Exception: " << e.message() << std::endl;
+      std::cout << "Class:     " << e.className() << std::endl;
+      std::cout << "Display:   " << e.displayText() << std::endl;
+      std::cout << "Name:      " << e.name() << std::endl;
+    }
   }
 
   void TearDown() override
@@ -296,13 +308,13 @@ protected:
     //delete amqpWorker;
   }
   AMQPProcessor* amqpProc;
-  IAMQPWorker* amqpWorker;
+  IAMQPWorkerSSL* amqpWorker;
 };
 
-//TEST_F(AMQPWorkerTest, CreateConnectionHandler)
-//{
-//  std::this_thread::sleep_for(std::chrono::seconds(120));
-//}
+TEST_F(AMQPWorkerTest, CreateConnectionHandler)
+{
+  std::this_thread::sleep_for(std::chrono::seconds(120));
+}
 
 TEST(add_one, sample)
 {

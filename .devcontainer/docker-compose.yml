@@ -14,14 +14,19 @@ services:
       - ${REPOSDIR}/agent:${WORKSPACEDIR}/agent
       - build_volume:${WORKSPACEDIR}/agent/build
       - ${HOME}/.ssh:/home/${DEVUSER}/.ssh
+      - ${HOME}/certs:/workspaces/certs
     command: ["sleep", "infinity"]
 
   broker:
-    image: rabbitmq:3-management
+    image: rabbitmq:3-management-ssl
     ports:
       - "15672:15672"
+    volumes:
+      - ${HOME}/certs:/etc/rabbitmq/certs
     networks:
       - agent_network
+    entrypoint: /usr/local/bin/docker-entrypoint.sh
+    command: rabbitmq-server
 
 networks:
   agent_network:
