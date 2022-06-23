@@ -4,8 +4,11 @@
 #include "IWorker.hpp"
 
 #include <amqpcpp.h>
+#include <Poco/Net/NetSSL.h>
+#include <Poco/Net/Context.h>
 #include <Poco/Net/SecureStreamSocket.h>
-#include <Poco/Crypto/X509Certificate.h>
+#include <Poco/Net/SSLManager.h>
+#include <Poco/Net/AcceptCertificateHandler.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
@@ -31,8 +34,6 @@ namespace agent
 	class IConnectionHandlerSSL : public AMQP::ConnectionHandler, public IWorker
 	{
 	public:
-		IConnectionHandlerSSL(unsigned int __id, Poco::Net::Context::Ptr __context);
-
 		/**
 		 * @brief Construct a new connection potentially with SSL
 		 * 
@@ -46,7 +47,7 @@ namespace agent
 		 * @param __copyright 
 		 * @param __information 
 		 */
-		IConnectionHandlerSSL(unsigned int __id, const std::string& _host, std::uint16_t _port, const std::string& _name, Poco::Net::Context::Ptr __context, const std::string& __product = "", const std::string& __version = "", const std::string& __copyright = "", const std::string& __information = "");
+		IConnectionHandlerSSL(unsigned int __id, const std::string& _host, std::uint16_t _port, const std::string& _name, const std::string& _privateKeyFile, const std::string& _certificateFile, const std::string& _caLocation, const std::string& __product = "", const std::string& __version = "", const std::string& __copyright = "", const std::string& __information = "");
 
 		/**
 		 * @brief Destroy the Connection Handler object
@@ -146,12 +147,12 @@ namespace agent
 		bool _connected;
 		Poco::Net::SecureStreamSocket _socket;
 		Poco::Net::Context::Ptr _context;
-		const Poco::Net::SocketAddress _address;
+		Poco::Net::SocketAddress _address;
 		AMQP::Connection* _connection;
 		Buffer _inpbuffer;
 		Buffer _outbuffer;
 		std::vector<char> _tmpbuffer;
 		void _sendDataFromBuffer();
-		SSLInitializer sslInitializer;
+		SSLInitializer _sslInitializer;
 	};
 }

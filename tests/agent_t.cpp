@@ -284,7 +284,6 @@ protected:
     {
       std::cerr << "JSON Error: " << e.what() << std::endl;
     }
-    std::cout << jsonConfig << std::endl;
     spdlog::set_level(spdlog::level::debug);
     amqpProc = new AMQPProcessor(100, "AMQPProcessor");
     amqpProc->Run(1);
@@ -313,7 +312,7 @@ protected:
 
 TEST_F(AMQPWorkerTest, CreateConnectionHandler)
 {
-  std::this_thread::sleep_for(std::chrono::seconds(120));
+  std::this_thread::sleep_for(std::chrono::seconds(12000));
 }
 
 TEST(add_one, sample)

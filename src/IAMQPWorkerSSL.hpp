@@ -85,17 +85,13 @@ namespace agent
 				  _host,
 				  _port,
 				  _name,
-				  new Poco::Net::Context(
-					Poco::Net::Context::Usage::TLS_CLIENT_USE,
-					__privateKeyFile,
-					__certificateFile,
-					__caLocation
-				  ),
+				  __privateKeyFile,
+				  __certificateFile,
+				  __caLocation,
 				  __product,
 				  __version,
 				  __copyright,
-				  __information
-			  )
+				  __information)
 		{
 			// Create the logger first
 			_logger = spdlog::get(GetName());
@@ -130,30 +126,28 @@ namespace agent
 			: _worker(_iworker),
 			  _creds(
 				  _config["credentials"]["username"].asString(),
-				  _config["credentials"]["password"].asString()
-			  ),
+				  _config["credentials"]["password"].asString()),
 			  _connection(
 				  this,
 				  _creds,
-				  _config["host"]["vhost"].asString()
-			  ),
+				  _config["host"]["vhost"].asString()),
 			  _channel(&_connection),
 			  _logger(nullptr),
 			  _queue(_config["settings"]["queue"].asString()),
 			  _exchange(_config["settings"]["exchange"].asString()),
 			  _key(_config["settings"]["key"].asString()),
-			  _queueFlags([_config](){
+			  _queueFlags([_config]()
+						  {
 				int total = 0;
 				for (auto flag : _config["settings"]["queueFlags"])
 					total |= allBitFlags[flag.asString()];
-				return total;
-			  }()),
-			  _exchangeFlags([_config](){
+				return total; }()),
+			  _exchangeFlags([_config]()
+							 {
 				int total = 0;
 				for (auto flag : _config["settings"]["exchangeFlags"])
 					total |= allBitFlags[flag.asString()];
-				return total;
-			  }()),
+				return total; }()),
 			  _prefetch(_config["settings"]["prefetch"].asUInt()),
 			  _exchangeType(exchangeTypeMap[_config["settings"]["exchangeType"].asString()]),
 			  IConnectionHandlerSSL(
@@ -161,13 +155,9 @@ namespace agent
 				  _config["host"]["host"].asString(),
 				  _config["host"]["port"].asUInt(),
 				  _config["name"].asString(),
-				  new Poco::Net::Context(
-					Poco::Net::Context::Usage::TLS_CLIENT_USE,
-					_config["credentials"]["privateKeyFile"].asString(),
-					_config["credentials"]["certificateFile"].asString(),
-					_config["credentials"]["caLocation"].asString(),
-					Poco::Net::Context::VerificationMode::VERIFY_NONE
-				  ),
+				  _config["credentials"]["privateKeyFile"].asString(),
+				  _config["credentials"]["certificateFile"].asString(),
+				  _config["credentials"]["caLocation"].asString(),
 				  _config["information"]["product"].asString(),
 				  _config["information"]["version"].asString(),
 				  _config["information"]["copyright"].asString(),

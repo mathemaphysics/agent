@@ -2,7 +2,7 @@
     "name": "ClientName",
     "host":
     {
-        "host": "broker",
+        "host": "172.18.0.2",
         "port": 5671,
         "vhost": "/"
     },
@@ -10,8 +10,8 @@
     {
         "username": "guest",
         "password": "guest",
-        "privateKeyFile": "/workspaces/certs/client_172.18.0.2_key.pem",
-        "certificateFile": "/workspaces/certs/client_172.18.0.2_certificate.pem",
+        "privateKeyFile": "/workspaces/certs/client_key.pem",
+        "certificateFile": "/workspaces/certs/client_certificate.pem",
         "caLocation": "/workspaces/certs/ca_certificate_client.pem"
     },
     "settings":
