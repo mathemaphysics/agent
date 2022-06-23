@@ -17,9 +17,9 @@ int main(int argc, char **argv)
 
     Poco::Net::Context::Ptr context = new Poco::Net::Context(
         Poco::Net::Context::Usage::CLIENT_USE,
-        "/workspaces/certs/client_key.pem",
-        "/workspaces/certs/client_certificate.pem",
-        "/workspaces/certs/ca_certificate.pem",
+        "/workspaces/certs/client_key_test.pem",
+        "/workspaces/certs/client_certificate_test.pem",
+        "/workspaces/certs/ca_certificate_test.pem",
         Poco::Net::Context::VERIFY_NONE,
         9,
         false,
@@ -37,6 +37,21 @@ int main(int argc, char **argv)
     //std::this_thread::sleep_for(std::chrono::minutes(2));
 
     _logger->info("Available to read: {}", socket.available());
+
+    char buffer[1024*1024];
+    while(1)
+    {
+        try
+        {
+            int x = socket.sendBytes(buffer, 24);
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::cout << "Receive returned: " << x << std::endl;
+        }
+        catch(const Poco::Exception& e)
+        {
+            std::cerr << e.what() << '\n';
+        }
+    }
 
     _logger->info("Cleaning up SSL");
     Poco::Net::uninitializeSSL();

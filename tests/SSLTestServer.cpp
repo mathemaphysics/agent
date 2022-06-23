@@ -42,7 +42,7 @@ public:
 
        Poco::Buffer<char> tempData(1024*1024);
 
-        int i = 0;
+       int i = 0;
        while (i < 3)
        {
         std::cout << "Ret: " << ss.receiveBytes(tempData) << std::endl;
@@ -71,39 +71,32 @@ int main(int argc, char **argv)
     _logger->info("Initializing SSL");
     Poco::Net::initializeSSL();
 
-    Poco::Net::Context::Ptr context = new Poco::Net::Context(
-        Poco::Net::Context::Usage::SERVER_USE,
-        "/workspaces/certs/server_key.pem",
-        "/workspaces/certs/server_certificate.pem",
-        "/workspaces/certs/ca_certificate.pem",
-        Poco::Net::Context::VERIFY_RELAXED
-    );
-
-    Poco::Net::SSLManager::PrivateKeyPassphraseHandlerPtr qtrHandler(new MyPassphraseHandler());
-    Poco::Net::SSLManager::InvalidCertificateHandlerPtr ptrHandler(new Poco::Net::AcceptCertificateHandler(false));
-    Poco::Net::SSLManager::instance().initializeServer(0, ptrHandler, context);
-
-    auto serverAddress = Poco::Net::SocketAddress("dcdfdef02f23", 8000);
-    Poco::Net::SecureServerSocket socket = Poco::Net::SecureServerSocket(
-        serverAddress,
-        64,
-        context
-    );
-
-
-
     Poco::Net::TCPServer *server;
     try
     {
-        /* code */
+        Poco::Net::Context::Ptr context = new Poco::Net::Context(
+            Poco::Net::Context::Usage::SERVER_USE,
+            "/workspaces/certs/server_key_test.pem",
+            "/workspaces/certs/server_certificate_test.pem",
+            "/workspaces/certs/ca_certificate_test.pem",
+            Poco::Net::Context::VERIFY_RELAXED);
+
+        Poco::Net::SSLManager::PrivateKeyPassphraseHandlerPtr qtrHandler(new MyPassphraseHandler());
+        Poco::Net::SSLManager::InvalidCertificateHandlerPtr ptrHandler(new Poco::Net::AcceptCertificateHandler(false));
+        Poco::Net::SSLManager::instance().initializeServer(0, ptrHandler, context);
+        auto serverAddress = Poco::Net::SocketAddress("dcdfdef02f23", 8000);
+        Poco::Net::SecureServerSocket socket = Poco::Net::SecureServerSocket(
+            serverAddress,
+            64,
+            context);
         server = new Poco::Net::TCPServer(new Poco::Net::TCPServerConnectionFactoryImpl<EchoConnection>(), socket);
+        server->start();
     }
     catch(const Poco::Exception& e)
     {
         std::cerr << e.what() << '\n';
     }
     
-    server->start();
     std::this_thread::sleep_for(std::chrono::minutes(10));
 
     _logger->info("Cleaning up SSL");
