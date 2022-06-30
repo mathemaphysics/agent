@@ -21,6 +21,7 @@ services:
     image: rabbitmq:3-management-ssl
     ports:
       - "15672:15672"
+      - "15671:15671"
     volumes:
       - ${HOME}/certs:/etc/rabbitmq/certs
     networks:
