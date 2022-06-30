@@ -53,7 +53,7 @@ agent::IConnectionHandlerSSL::IConnectionHandlerSSL(
             __privateKeyFile,
             __certificateFile,
             __caLocation,
-            Poco::Net::Context::VerificationMode::VERIFY_RELAXED
+            Poco::Net::Context::VerificationMode::VERIFY_NONE
           )
         )
       ),
@@ -136,9 +136,8 @@ void agent::IConnectionHandlerSSL::onData(AMQP::Connection *__connection, const 
     _connection = __connection;
 
   // Send any outgoing data that has shown up in the buffer
-  _socket.sendBytes(_data, _size);
+  int nbytes = _socket.sendBytes(_data, _size);
 
-  // TODO: Maybe make this debug level?
   _logger->debug("[onData] Sent {} bytes", _size);
 }
 
@@ -197,25 +196,18 @@ void agent::IConnectionHandlerSSL::operator()()
   // This is the main worker loop for AMQP transactions
   while (GetState() != WORKER_QUIT)
   {
-    // See if there's any data available on the incoming socket
-    const size_t savail = _socket.available();
-    if (savail > 0)
-    {
-      // You might have to resize for larger incoming chunk
-      if (savail > _tmpbuffer.size())
-        _tmpbuffer.resize(savail, 0);
-      
-      // Make sure all bytes read were processed
-      const int rbytes = _socket.receiveBytes(_tmpbuffer.data(), savail);
-      const int wbytes = _inpbuffer.Write(_tmpbuffer.data(), rbytes);
+    //// You might have to resize for larger incoming chunk
+    //if (savail > _tmpbuffer.size())
+    //  _tmpbuffer.resize(savail, 0);
+    
+    // Make sure all bytes read were processed
+    const int rbytes = _socket.receiveBytes(_tmpbuffer.data(), _tmpbuffer.size());
+    if (rbytes < 0)
+      _logger->info("Received rbytes = {}", rbytes);
+    const int wbytes = _inpbuffer.Write(_tmpbuffer.data(), rbytes);
 
-      if (wbytes != rbytes)
-        _logger->debug("Could not write full contents to input buffer");
-    }
-    else if (savail < 0)
-    {
-      _logger->error("Socket error: Available bytes on socket < 0");
-    }
+    if (wbytes != rbytes)
+      _logger->debug("Could not write full contents to input buffer");
 
     const size_t iavail = _inpbuffer.Available();
     if (iavail > 0)

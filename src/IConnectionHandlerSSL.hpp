@@ -146,7 +146,6 @@ namespace agent
 		std::string _information;
 		bool _connected;
 		Poco::Net::SecureStreamSocket _socket;
-		Poco::Net::Context::Ptr _context;
 		Poco::Net::SocketAddress _address;
 		AMQP::Connection* _connection;
 		Buffer _inpbuffer;
