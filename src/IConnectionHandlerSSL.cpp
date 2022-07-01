@@ -11,12 +11,9 @@
 #include <amqpcpp.h>
 #include <spdlog/spdlog.h>
 #include <Poco/Net/SecureStreamSocket.h>
-#include <Poco/Net/SSLManager.h>
 #include <Poco/Net/Context.h>
-#include "Poco/Net/ConsoleCertificateHandler.h"
-#include "Poco/SharedPtr.h"
-#include "Poco/Exception.h"
-#include "Poco/URI.h"
+#include <Poco/SharedPtr.h>
+#include <Poco/Exception.h>
 
 agent::IConnectionHandlerSSL::IConnectionHandlerSSL(
     unsigned int _id,
