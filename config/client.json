@@ -2,21 +2,24 @@
     "name": "ClientName",
     "host":
     {
-        "host": "broker",
-        "port": 5672,
+        "host": "172.18.0.2",
+        "port": 5671,
         "vhost": "/"
     },
     "credentials":
     {
         "username": "guest",
-        "password": "guest"
+        "password": "guest",
+        "privateKeyFile": "/workspaces/certs/client_key.pem",
+        "certificateFile": "/workspaces/certs/client_certificate.pem",
+        "caLocation": "/workspaces/certs/ca_certificate_client.pem"
     },
     "settings":
     {
-        "queue": "queueName3",
-        "exchange": "exchangeName3",
-        "key": "queueName3",
-        "prefetch": 4,
+        "queue": "queueName",
+        "exchange": "exchangeName",
+        "key": "queueName",
+        "prefetch": 1,
         "queueFlags": [
             "autodelete"
         ],

@@ -19,12 +19,16 @@ namespace agent
 		IConnectionHandler(unsigned int __id);
 
 		/**
-		 * @brief Construct a new Connection Handler object
+		 * @brief Construct a new IConnectionHandler object
 		 * 
-		 * @param _host AMQP host to connect to
-		 * @param _port AMQP port to connect to
-		 * @param _name Client name to assign the consumer
-		 * @param _logname Name to give the logger
+		 * @param __id Process ID (deprecated, I hope)
+		 * @param _host Host address to connect to
+		 * @param _port Port to connect to
+		 * @param _name Client name to report to the server
+		 * @param __product Name of the product software to report
+		 * @param __version Version of the product software to report
+		 * @param __copyright Copyright string to report
+		 * @param __information Additional information/website to report
 		 */
 		IConnectionHandler(unsigned int __id, const std::string& _host, std::uint16_t _port, const std::string& _name, const std::string& __product = "", const std::string& __version = "", const std::string& __copyright = "", const std::string& __information = "");
 
@@ -102,6 +106,13 @@ namespace agent
 		int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr);
 
 		/**
+		 * @brief Returns the underlying \c Poco::Net::StreamSocket
+		 * 
+		 * @return Poco::Net::StreamSocket& 
+		 */
+		Poco::Net::StreamSocket& socket();
+
+		/**
 		 * @brief Function which runs the loop
 		 * 
 		 */
@@ -125,11 +136,11 @@ namespace agent
 		std::string _information;
 		bool _connected;
 		Poco::Net::StreamSocket _socket;
-		const Poco::Net::SocketAddress _address;
-		AMQP::Connection* _connection;
+		Poco::Net::SocketAddress _address;
 		Buffer _inpbuffer;
 		Buffer _outbuffer;
 		std::vector<char> _tmpbuffer;
+		AMQP::Connection* _connection;
 		void _sendDataFromBuffer();
 	};
 }
