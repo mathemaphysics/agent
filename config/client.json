@@ -2,7 +2,7 @@
     "name": "ClientName",
     "host":
     {
-        "host": "172.18.0.2",
+        "host": "broker",
         "port": 5671,
         "vhost": "/"
     },
