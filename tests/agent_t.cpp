@@ -291,6 +291,49 @@ protected:
 
     try
     {
+      amqpWorker = new IAMQPWorker(1, amqpProc, jsonConfig);
+    }
+    catch (const Poco::Exception& e)
+    {
+      std::cout << "Exception: " << e.message() << std::endl;
+      std::cout << "Class:     " << e.className() << std::endl;
+      std::cout << "Display:   " << e.displayText() << std::endl;
+      std::cout << "Name:      " << e.name() << std::endl;
+    }
+  }
+
+  void TearDown() override
+  {
+    //delete amqpWorker;
+  }
+  AMQPProcessor* amqpProc;
+  IAMQPWorker* amqpWorker;
+};
+
+class AMQPWorkerTestSSL : public ::testing::Test
+{
+protected:
+  void SetUp() override
+  {
+    Json::Value jsonConfig;
+    Json::CharReaderBuilder builder;
+    builder["collectComments"] = false;
+    Json::String errs;
+    auto ssConfig = std::ifstream("/workspaces/agent/config/client.json");
+    try
+    {
+      Json::parseFromStream(builder, ssConfig, &jsonConfig, &errs);
+    }
+    catch (const Json::Exception& e)
+    {
+      std::cerr << "JSON Error: " << e.what() << std::endl;
+    }
+    spdlog::set_level(spdlog::level::debug);
+    amqpProc = new AMQPProcessor(100, "AMQPProcessor");
+    amqpProc->Run(1);
+
+    try
+    {
       amqpWorker = new IAMQPWorkerSSL(1, amqpProc, jsonConfig);
     }
     catch (const Poco::Exception& e)
@@ -312,7 +355,12 @@ protected:
 
 TEST_F(AMQPWorkerTest, CreateConnectionHandler)
 {
-  std::this_thread::sleep_for(std::chrono::seconds(12000));
+  //std::this_thread::sleep_for(std::chrono::seconds(12000));
+}
+
+TEST_F(AMQPWorkerTestSSL, CreateConnectionHandler)
+{
+  //std::this_thread::sleep_for(std::chrono::seconds(12000));
 }
 
 TEST(add_one, sample)
