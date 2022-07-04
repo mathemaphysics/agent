@@ -16,7 +16,7 @@ namespace agent
      */
     std::map<std::string, AMQP::ExchangeType> exchangeTypeMap =
     {
-        {"consistent_hash" , AMQP::ExchangeType::consistent_hash},
+        {"consistent_hash", AMQP::ExchangeType::consistent_hash},
         {"direct", AMQP::ExchangeType::direct},
         {"fanout", AMQP::ExchangeType::fanout},
         {"headers", AMQP::ExchangeType::headers},

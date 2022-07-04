@@ -2,6 +2,7 @@
 #include <thread>
 #include <chrono>
 #include <Poco/SharedPtr.h>
+#include <Poco/Net/SocketStream.h>
 #include <Poco/Net/NetSSL.h>
 #include <Poco/Net/Session.h>
 #include <Poco/Net/Context.h>
@@ -19,51 +20,6 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-class EchoConnection: public Poco::Net::TCPServerConnection
-{
-public:
-   EchoConnection(const Poco::Net::StreamSocket& s): Poco::Net::TCPServerConnection(s){}
-
-   void run()
-   {
-       Poco::Net::SecureStreamSocket ss = (Poco::Net::SecureStreamSocket)dynamic_cast<const Poco::Net::StreamSocket&>(socket());
-       ss.completeHandshake();
-       if (ss.secure())
-          std::cout << "Connection is secure" << std::endl;
-       std::cout << "Connection from client: " << ss.address() << std::endl;
-       try
-       {
-           std::cout << "Here's something" << std::endl;
-       }
-       catch (Poco::Exception& exc)
-       {
-           std::cerr << "--> EchoConnection: " << exc.displayText() << std::endl;
-       }
-
-       Poco::Buffer<char> tempData(1024*1024);
-
-       int i = 0;
-       while (i < 3)
-       {
-        std::cout << "Ret: " << ss.receiveBytes(tempData) << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        ++i;
-       }
-       ss.close();
-   }
-};
-
-class MyPassphraseHandler : public Poco::Net::PrivateKeyPassphraseHandler
-{
-public:
-    MyPassphraseHandler() : Poco::Net::PrivateKeyPassphraseHandler(true) {}
-
-    void onPrivateKeyRequested(const void* pSender, std::string& privateKey)
-    {
-        std::cout << "Private key is requested" << std::endl;
-    }
-};
-
 int main(int argc, char **argv)
 {
     auto _logger = spdlog::stdout_color_mt("Client");
@@ -71,7 +27,6 @@ int main(int argc, char **argv)
     _logger->info("Initializing SSL");
     Poco::Net::initializeSSL();
 
-    Poco::Net::TCPServer *server;
     try
     {
         Poco::Net::Context::Ptr context = new Poco::Net::Context(
@@ -79,24 +34,34 @@ int main(int argc, char **argv)
             "/workspaces/certs/server_key_test.pem",
             "/workspaces/certs/server_certificate_test.pem",
             "/workspaces/certs/ca_certificate_test.pem",
-            Poco::Net::Context::VERIFY_RELAXED);
+            Poco::Net::Context::VERIFY_NONE
+        );
 
-        Poco::Net::SSLManager::PrivateKeyPassphraseHandlerPtr qtrHandler(new MyPassphraseHandler());
         Poco::Net::SSLManager::InvalidCertificateHandlerPtr ptrHandler(new Poco::Net::AcceptCertificateHandler(false));
         Poco::Net::SSLManager::instance().initializeServer(0, ptrHandler, context);
-        auto serverAddress = Poco::Net::SocketAddress("dcdfdef02f23", 8000);
+
         Poco::Net::SecureServerSocket socket = Poco::Net::SecureServerSocket(
-            serverAddress,
+            8000,
             64,
-            context);
-        server = new Poco::Net::TCPServer(new Poco::Net::TCPServerConnectionFactoryImpl<EchoConnection>(), socket);
-        server->start();
+            context
+        );
+        //Poco::Net::ServerSocket socket(8000);
+
+        while (1)
+        {
+            auto conn = socket.acceptConnection();
+            auto sconn = static_cast<Poco::Net::SecureStreamSocket>(conn);
+            sconn.completeHandshake();
+            Poco::Net::SocketStream str(sconn);
+            //Poco::Net::SocketStream str(conn);
+            str << "This is a message" << std::flush;
+        }
     }
-    catch(const Poco::Exception& e)
+    catch (const Poco::Exception &e)
     {
-        std::cerr << e.what() << '\n';
+        std::cerr << e.what() << std::endl;
     }
-    
+
     std::this_thread::sleep_for(std::chrono::minutes(10));
 
     _logger->info("Cleaning up SSL");
