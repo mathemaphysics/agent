@@ -220,7 +220,7 @@ void agent::IConnectionHandlerSSL::operator()()
         _inpbuffer.Shift(parsed);
     }
     _sendDataFromBuffer();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 
   if (GetState() == WORKER_QUIT && _outbuffer.Available())

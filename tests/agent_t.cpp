@@ -310,10 +310,10 @@ protected:
   IAMQPWorkerSSL* amqpWorker;
 };
 
-//TEST_F(AMQPWorkerTest, CreateConnectionHandler)
-//{
-//  std::this_thread::sleep_for(std::chrono::seconds(12000));
-//}
+TEST_F(AMQPWorkerTest, CreateConnectionHandler)
+{
+  std::this_thread::sleep_for(std::chrono::seconds(12000));
+}
 
 TEST(add_one, sample)
 {
