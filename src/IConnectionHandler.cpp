@@ -193,6 +193,12 @@ int agent::IConnectionHandler::ProcessMessage(const void*_msg, std::uint32_t _si
   return 0;
 }
 
+// Needed for handling conversion of StreamSocket to SecureStreamSocket
+Poco::Net::StreamSocket& agent::IConnectionHandler::socket()
+{
+  return _socket;
+}
+
 void agent::IConnectionHandler::operator()()
 {
   // This is the main worker loop for AMQP transactions

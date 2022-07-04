@@ -18,7 +18,7 @@ services:
     command: ["sleep", "infinity"]
 
   broker:
-    image: rabbitmq:3-management-ssl
+    image: mathemaphysics/rabbitmq:3-management-ssl
     ports:
       - "15672:15672"
       - "15671:15671"

@@ -102,6 +102,13 @@ namespace agent
 		int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr);
 
 		/**
+		 * @brief Returns the underlying \c Poco::Net::StreamSocket
+		 * 
+		 * @return Poco::Net::StreamSocket& 
+		 */
+		Poco::Net::StreamSocket& socket();
+
+		/**
 		 * @brief Function which runs the loop
 		 * 
 		 */
@@ -115,6 +122,11 @@ namespace agent
 
 	protected:
 		std::shared_ptr<spdlog::logger> _logger;
+		Buffer _inpbuffer;
+		Buffer _outbuffer;
+		std::vector<char> _tmpbuffer;
+		void _sendDataFromBuffer();
+		AMQP::Connection* _connection;
 
 	private:
 		void _connectSocket(Poco::Net::SocketAddress _address);
@@ -125,11 +137,6 @@ namespace agent
 		std::string _information;
 		bool _connected;
 		Poco::Net::StreamSocket _socket;
-		const Poco::Net::SocketAddress _address;
-		AMQP::Connection* _connection;
-		Buffer _inpbuffer;
-		Buffer _outbuffer;
-		std::vector<char> _tmpbuffer;
-		void _sendDataFromBuffer();
+		Poco::Net::SocketAddress _address;
 	};
 }
