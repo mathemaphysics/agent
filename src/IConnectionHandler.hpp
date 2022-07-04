@@ -19,12 +19,16 @@ namespace agent
 		IConnectionHandler(unsigned int __id);
 
 		/**
-		 * @brief Construct a new Connection Handler object
+		 * @brief Construct a new IConnectionHandler object
 		 * 
-		 * @param _host AMQP host to connect to
-		 * @param _port AMQP port to connect to
-		 * @param _name Client name to assign the consumer
-		 * @param _logname Name to give the logger
+		 * @param __id Process ID (deprecated, I hope)
+		 * @param _host Host address to connect to
+		 * @param _port Port to connect to
+		 * @param _name Client name to report to the server
+		 * @param __product Name of the product software to report
+		 * @param __version Version of the product software to report
+		 * @param __copyright Copyright string to report
+		 * @param __information Additional information/website to report
 		 */
 		IConnectionHandler(unsigned int __id, const std::string& _host, std::uint16_t _port, const std::string& _name, const std::string& __product = "", const std::string& __version = "", const std::string& __copyright = "", const std::string& __information = "");
 

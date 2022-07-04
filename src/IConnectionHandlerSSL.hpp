@@ -35,19 +35,21 @@ namespace agent
 	class IConnectionHandlerSSL : public IConnectionHandler
 	{
 	public:
-		/**
-		 * @brief Construct a new connection potentially with SSL
-		 * 
-		 * @param __id 
-		 * @param _host 
-		 * @param _port 
-		 * @param _name 
-		 * @param __context 
-		 * @param __product 
-		 * @param __version 
-		 * @param __copyright 
-		 * @param __information 
-		 */
+	 	/**
+	 	 * @brief Construct a new IConnectionHandlerSSL object
+	 	 * 
+		 * @param __id Process ID (deprecated, I hope)
+		 * @param _host Host address to connect to
+		 * @param _port Port to connect to
+		 * @param _name Client name to report to the server
+	 	 * @param _privateKeyFile Client private key PEM file path
+	 	 * @param _certificateFile Client certificate PEM file path
+	 	 * @param _caLocation Certificate authority path
+		 * @param __product Name of the product software to report
+		 * @param __version Version of the product software to report
+		 * @param __copyright Copyright string to report
+		 * @param __information Additional information/website to report
+	 	 */
 		IConnectionHandlerSSL(unsigned int __id, const std::string& _host, std::uint16_t _port, const std::string& _name, const std::string& _privateKeyFile, const std::string& _certificateFile, const std::string& _caLocation, const std::string& __product = "", const std::string& __version = "", const std::string& __copyright = "", const std::string& __information = "");
 
 		/**
