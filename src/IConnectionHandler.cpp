@@ -202,40 +202,84 @@ Poco::Net::StreamSocket& agent::IConnectionHandler::socket()
 void agent::IConnectionHandler::operator()()
 {
   // This is the main worker loop for AMQP transactions
-  while (GetState() != WORKER_QUIT)
+  if (_socket.secure())
   {
-    // See if there's any data available on the incoming socket
-    const size_t savail = _socket.available();
-    if (savail > 0)
+    // Debugging info; indicate we're in TLS mode
+    _logger->debug("Connection is secure");
+
+    // We need to ignore _socket.available() in secure mode; it always returns 0
+    while (GetState() != WORKER_QUIT)
     {
-      // You might have to resize for larger incoming chunk
-      if (savail > _tmpbuffer.size())
-        _tmpbuffer.resize(savail, 0);
+      /**
+       * Important: Because we can't use _socket.available() becuase it doesn't
+       * work for TLS, we need to have another way of sizing the buffer in the
+       * case of a large amount of incoming data.
+       */
       
       // Make sure all bytes read were processed
-      const int rbytes = _socket.receiveBytes(_tmpbuffer.data(), savail);
+      const int rbytes = _socket.receiveBytes(_tmpbuffer.data(), _tmpbuffer.size());
+      if (rbytes < 0)
+        _logger->info("Received rbytes = {}", rbytes);
       const int wbytes = _inpbuffer.Write(_tmpbuffer.data(), rbytes);
 
       if (wbytes != rbytes)
         _logger->debug("Could not write full contents to input buffer");
-    }
-    else if (savail < 0)
-    {
-      _logger->error("Socket error: Available bytes on socket < 0");
-    }
 
-    const size_t iavail = _inpbuffer.Available();
-    if (iavail > 0)
-    {
-      const size_t parsed = _connection->parse(_inpbuffer.Data(), iavail);
+      const size_t iavail = _inpbuffer.Available();
+      if (iavail > 0)
+      {
+        const size_t parsed = _connection->parse(_inpbuffer.Data(), iavail);
 
-      if (parsed == iavail)
-        _inpbuffer.Drain();
-      else if (parsed > 0)
-        _inpbuffer.Shift(parsed);
+        if (parsed == iavail)
+          _inpbuffer.Drain();
+        else if (parsed > 0)
+          _inpbuffer.Shift(parsed);
+      }
+      _sendDataFromBuffer();
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
-    _sendDataFromBuffer();
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  }
+  else
+  {
+    // Debugging info
+    _logger->debug("Connection is not secure");
+
+    // If we're not in TLS mode, we can use _socket.available()
+    while (GetState() != WORKER_QUIT)
+    {
+      // See if there's any data available on the incoming socket
+      const size_t savail = _socket.available();
+      if (savail > 0)
+      {
+        // You might have to resize for larger incoming chunk
+        if (savail > _tmpbuffer.size())
+          _tmpbuffer.resize(savail, 0);
+        
+        // Make sure all bytes read were processed
+        const int rbytes = _socket.receiveBytes(_tmpbuffer.data(), savail);
+        const int wbytes = _inpbuffer.Write(_tmpbuffer.data(), rbytes);
+
+        if (wbytes != rbytes)
+          _logger->debug("Could not write full contents to input buffer");
+      }
+      else if (savail < 0)
+      {
+        _logger->error("Socket error: Available bytes on socket < 0");
+      }
+
+      const size_t iavail = _inpbuffer.Available();
+      if (iavail > 0)
+      {
+        const size_t parsed = _connection->parse(_inpbuffer.Data(), iavail);
+
+        if (parsed == iavail)
+          _inpbuffer.Drain();
+        else if (parsed > 0)
+          _inpbuffer.Shift(parsed);
+      }
+      _sendDataFromBuffer();
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
   }
 
   if (GetState() == WORKER_QUIT && _outbuffer.Available())

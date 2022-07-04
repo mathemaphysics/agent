@@ -58,17 +58,11 @@ namespace agent
 		 */
 		~IConnectionHandlerSSL() = default;
 
-		/**
-		 * @brief Function which runs the loop
-		 * 
-		 */
-		void operator()() override;
-
 	protected:
 		std::shared_ptr<spdlog::logger> _logger;
 
 	private:
-		Poco::Net::SecureStreamSocket _socket;
+		//Poco::Net::SecureStreamSocket _socket;
 		SSLInitializer _sslInitializer;
 	};
 }

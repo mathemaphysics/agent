@@ -122,11 +122,6 @@ namespace agent
 
 	protected:
 		std::shared_ptr<spdlog::logger> _logger;
-		Buffer _inpbuffer;
-		Buffer _outbuffer;
-		std::vector<char> _tmpbuffer;
-		void _sendDataFromBuffer();
-		AMQP::Connection* _connection;
 
 	private:
 		void _connectSocket(Poco::Net::SocketAddress _address);
@@ -138,5 +133,10 @@ namespace agent
 		bool _connected;
 		Poco::Net::StreamSocket _socket;
 		Poco::Net::SocketAddress _address;
+		Buffer _inpbuffer;
+		Buffer _outbuffer;
+		std::vector<char> _tmpbuffer;
+		AMQP::Connection* _connection;
+		void _sendDataFromBuffer();
 	};
 }
