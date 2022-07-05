@@ -61,182 +61,38 @@ namespace agent
 			const std::string &__product = "",
 			const std::string &__version = "",
 			const std::string &__copyright = "",
-			const std::string &__information = "")
-			: _worker(_iworker),
-			  _creds(_user, _pass),
-			  _connection(this, _creds, _vhost),
-			  _channel(&_connection),
-			  _logger(nullptr),
-			  _queue(__queue),
-			  _exchange(__exchange),
-			  _key(__key),
-			  _queueFlags(__queueFlags),
-			  _exchangeFlags(__exchangeFlags),
-			  _prefetch(__prefetch),
-			  _exchangeType(__exchangeType),
-			  IConnectionHandler(
-				  _id,
-				  _host,
-				  _port,
-				  _name,
-				  __product,
-				  __version,
-				  __copyright,
-				  __information
-			  )
-		{
-			// Create the logger first
-			_logger = spdlog::get(GetName());
-			if (_logger == nullptr)
-				_logger = spdlog::stdout_color_mt(GetName());
-
-			// Declare the queue and exchange and bind them
-			InitializeQueue();
-
-			// Set the worker callbacks
-			SetConsumerCallbacks();
-
-			// Start the threads
-			try
-			{
-				Run();
-			}
-			catch(const std::exception& e)
-			{
-				_logger->error("Exception caught: {}", e.what());
-			}
-			catch(...)
-			{
-				_logger->error("Anonymous exception caught");
-			}
-		}
+			const std::string &__information = "");
 
 		IAMQPWorker(
 			unsigned int _id,
 			IWorker *_iworker,
-			Json::Value _config)
-			: _worker(_iworker),
-			  _creds(
-				  _config["credentials"]["username"].asString(),
-				  _config["credentials"]["password"].asString()
-			  ),
-			  _connection(
-				  this,
-				  _creds,
-				  _config["host"]["vhost"].asString()
-			  ),
-			  _channel(&_connection),
-			  _logger(nullptr),
-			  _queue(_config["settings"]["queue"].asString()),
-			  _exchange(_config["settings"]["exchange"].asString()),
-			  _key(_config["settings"]["key"].asString()),
-			  _queueFlags([_config](){
-				int total = 0;
-				for (auto flag : _config["settings"]["queueFlags"])
-					total |= allBitFlags[flag.asString()];
-				return total;
-			  }()),
-			  _exchangeFlags([_config](){
-				int total = 0;
-				for (auto flag : _config["settings"]["exchangeFlags"])
-					total |= allBitFlags[flag.asString()];
-				return total;
-			  }()),
-			  _prefetch(_config["settings"]["prefetch"].asUInt()),
-			  _exchangeType(exchangeTypeMap[_config["settings"]["exchangeType"].asString()]),
-			  IConnectionHandler(
-				  _id,
-				  _config["host"]["host"].asString(),
-				  _config["host"]["port"].asUInt(),
-				  _config["name"].asString(),
-				  _config["information"]["product"].asString(),
-				  _config["information"]["version"].asString(),
-				  _config["information"]["copyright"].asString(),
-				  _config["information"]["information"].asString()
-			  )
-		{
-			// Create the logger first
-			_logger = spdlog::get(GetName());
-			if (_logger == nullptr)
-				_logger = spdlog::stdout_color_mt(GetName());
+			Json::Value _config);
 
-			// Declare the queue and exchange and bind them
-			InitializeQueue();
-
-			// Set the worker callbacks
-			SetConsumerCallbacks();
-
-			// Start the threads
-			try
-			{
-				Run();
-			}
-			catch(const std::exception& e)
-			{
-				_logger->error("Exception caught: {}", e.what());
-			}
-			catch(...)
-			{
-				_logger->error("Anonymous exception caught");
-			}
-		}
-
-		virtual ~IAMQPWorker()
-		{
-			_channel.close();
-		}
+		virtual ~IAMQPWorker();
 
 		/**
 		 * @brief Create the exchange and bind it to an exchange
 		 * 
 		 */
-		void InitializeQueue()
-		{
-			_channel.declareQueue(_queue, _queueFlags);
-			_channel.declareExchange(_exchange, _exchangeType, _exchangeFlags);
-			_channel.bindQueue(_exchange, _queue, _key);
-			_channel.setQos(_prefetch);
-		}
+		void InitializeQueue();
 
 		/**
 		 * @brief Set the consumer callbacks
 		 * 
 		 */
-		void SetConsumerCallbacks()
-		{
-			// Set the consumer callbacks here
-			_channel.consume(
-					_queue,
-					_key
-				).onReceived(
-					[this](const AMQP::Message& message, uint64_t tag, bool redelivered) {
-						_logger->info("[onReceived] Received message {}", tag);
-						_worker->AddMessage(message.body(), message.bodySize());
-					}
-				).onComplete(
-					[this](uint64_t tag, bool result) {
-						_logger->info("[onComplete] Finished message {}", tag);
-						_channel.ack(tag);
-					}
-				).onError(
-					[this](const char* message){
-						_logger->error("[onError] {}", message);
-					}
-				);
-		}
+		void SetConsumerCallbacks();
 
 		/**
 		 * @brief Overridden version of \c AddMessage from \c IWorker which,
 		 * instead of adding to the local \c std::deque of message, adds the
 		 * message to the AMQP queue
 		 * 
-		 * @param _msg  Pointer to the message itself
-		 * @param _size Size of the message (in bytes)
+		 * @param _msg Raw message content serialized
+		 * @param _size Number of bytes contained in the message
+		 * @param _exchange Exchange to send to
+		 * @param _key Key associated with message
 		 */
-		void AddMessage(const void* _msg, std::uint32_t _size, std::string _exchange = "", std::string _key = "")
-		{
-			_channel.publish(_exchange, _key, static_cast<const char*>(_msg), _size, 0);
-		}
+		void AddMessage(const void* _msg, std::uint32_t _size, std::string _exchange = "", std::string _key = "");
 
 		/**
 		 * @brief Worker that runs a single message
