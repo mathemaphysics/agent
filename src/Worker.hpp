@@ -27,7 +27,6 @@ namespace agent
 		 * @brief Construct a new Worker object
 		 * 
 		 * @param _id ID to assign to this \c Worker
-		 * @param _start Start thread immediately if true, else not
 		 */
 		Worker(unsigned int _id);
 
@@ -36,7 +35,6 @@ namespace agent
 		 * 
 		 * @param _id ID to assign to this \c Worker
 		 * @param _name Name to assign the \c Worker
-		 * @param _start Start thread immediately if true, else not
 		 */
 		Worker(unsigned int _id, std::string _name);
 		~Worker();
@@ -50,6 +48,8 @@ namespace agent
 		 * 
 		 * @param _msg  Pointer to the memory containing the message to process
 		 * @param _size Number of bytes contained in the message
+		 * @param _result Output data (optional)
+		 * @param _rsize Size of output data (optional)
 		 * @return int ID of the message it processed
 		 */
 		int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr) override;

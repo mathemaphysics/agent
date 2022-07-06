@@ -1,6 +1,6 @@
 build_flatbuffers(Message.fbs "" schemas "" . "" "")
 
-add_library(agent agent.cpp Worker.cpp FWorker.cpp IConnectionHandler.cpp IConnectionHandlerSSL.cpp IAMQPWorker.cpp IAMQPWorkerSSL.cpp Buffer.cpp)
+add_library(agent agent.cpp Worker.cpp IWorker.cpp FWorker.cpp IConnectionHandler.cpp IConnectionHandlerSSL.cpp IAMQPWorker.cpp IAMQPWorkerSSL.cpp Buffer.cpp)
 target_compile_features(agent PUBLIC cxx_std_17)
 add_dependencies(agent schemas)
 target_include_directories(agent PUBLIC

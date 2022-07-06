@@ -33,17 +33,7 @@ namespace agent
 		 * 
 		 * @param __id The ID number for this worker
 		 */
-		IWorker(unsigned int __id)
-		{
-			_id = __id;
-			_state.store(WORKER_READY); ///< Sets the default to "ready"
-
-			// Check if logger called GetName() exists, else create it
-			_logger = spdlog::get(_name);
-			if (_logger == nullptr)
-				_logger = spdlog::stdout_color_mt(_name);
-			_logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%^%l%$] [%t] %v");
-		}
+		IWorker(unsigned int __id);
 
 		/**
 		 * @brief Construct a new IWorker object
@@ -51,44 +41,13 @@ namespace agent
 		 * @param __id Desired worker ID
 		 * @param __name Desired worker name
 		 */
-		IWorker(unsigned int __id, std::string __name)
-		{
-			_id = __id;
-			_name = __name;
-			_state.store(WORKER_READY);
-
-			// Use the given name as name for _logger
-			_logger = spdlog::get(__name);
-			if (_logger == nullptr)
-				_logger = spdlog::stdout_color_mt(__name);
-			_logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%^%l%$] [%t] %v");
-		}
+		IWorker(unsigned int __id, std::string __name);
 
 		/**
 		 * @brief Destroy the IWorker object
 		 * 
 		 */
-		virtual ~IWorker()
-		{
-			// Quit the loop
-			SetQuit();
-
-			// Wait for threads to join
-			std::for_each(
-				_threads.begin(),
-				_threads.end(),
-				[](std::thread &thr){
-					if (thr.joinable())
-						thr.join();
-				}
-			);
-
-			// Clear threads out because we're done
-			_threads.clear();
-
-			// Just to be pedantic
-			_state.store(WORKER_READY);
-		}
+		virtual ~IWorker();
 
 		/**
 		 * @brief Starts the worker thread itself
@@ -96,78 +55,41 @@ namespace agent
 		 * This function exists for the case that you might want to inherit \c
 		 * IWorker and do more setup of the object before starting the thread
 		 */
-		void Run(std::size_t _nthread = 1)
-		{
-			for (int tid = 0; tid < _nthread; ++tid)
-				_threads.emplace_back(std::ref(*this));
-			_state.store(WORKER_RUNNING);
-		}
+		void Run(std::size_t _nthread = 1);
 
 		/**
 		 * @brief Stops all threads
 		 * 
 		 */
-		void Stop()
-		{
-			// Tell threads to quit
-			SetQuit();
-			
-			// Wait for threads to join
-			std::for_each(
-				_threads.begin(),
-				_threads.end(),
-				[](std::thread &thr){
-					if (thr.joinable())
-						thr.join();
-				}
-			);
-
-			// Clear threads out because we're done
-			_threads.clear();
-
-			// Threads stopped; ready for another run
-			_state.store(WORKER_READY);
-		}
+		void Stop();
 
 		/**
 		 * @brief Get the ID of the worker
 		 * 
 		 * @return unsigned int ID of the worker
 		 */
-		unsigned int GetId() const
-		{
-			return _id;
-		}
+		unsigned int GetId() const;
 		
 		/**
 		 * @brief Get the name object
 		 * 
 		 * @return std::string The name, if set, of the worker object
 		 */
-		std::string GetName() const
-		{
-			return _name;
-		}
+		std::string GetName() const;
 
 		/**
 		 * @brief Set the name object
 		 * 
 		 * @param __name Desired name of the worker object
 		 */
-		void SetName(std::string __name)
-		{
-			_name = __name;
-		}
+		void SetName(std::string __name);
 
 		/**
 		 * @brief Gets the state of the worker, a \c WorkerState
 		 * 
 		 * @return WorkerState State of the worker
 		 */
-		WorkerState GetState() const
-		{
-			return _state.load();
-		}
+		WorkerState GetState() const;
 
 		/**
 		 * @brief Set the quit state
@@ -175,17 +97,9 @@ namespace agent
 		 * Sets the \c _state to \c WORKER_QUIT to kill the thread.
 		 * 
 		 */
-		void SetQuit()
-		{
-			_state.store(WORKER_QUIT);
-		}
+		void SetQuit();
 
-		virtual void AddMessage(const void* _msg, std::uint32_t _size)
-		{
-			_data_lock.lock();
-			_data.push_front(std::pair<const void*, std::uint32_t>(_msg, _size));
-			_data_lock.unlock();
-		}
+		virtual void AddMessage(const void* _msg, std::uint32_t _size);
 
 		/**
 		 * @brief Process the given (serialized) message
@@ -207,58 +121,7 @@ namespace agent
 		 * until \c _data is exhausted.
 		 * 
 		 */
-		virtual void operator()()
-		{
-			while (GetState() != WORKER_QUIT)
-			{
-				// Create space for a potential message
-				bool received = false;
-				std::pair<const void *, std::uint32_t> curmsg;
-
-				// Lock _data and grab a message
-				_data_lock.lock();
-				if (!_data.empty())
-				{
-					curmsg = _data.back();
-					_data.pop_back();
-					received = true;
-				}
-				_data_lock.unlock();
-
-				// Now the lock is off; process the message
-				if (received)
-				{
-					// Now process it
-					const auto message = curmsg.first;
-					const auto size = curmsg.second;
-					try
-					{
-						int msgId = ProcessMessage(message, size);
-						_logger->info("Successfully processed message {}", msgId);
-					}
-					catch(const std::exception& e)
-					{
-						_logger->critical(e.what());
-					}
-				}
-			}
-		}
-
-
-		/**
-		 * @brief Converts a \c std::thread::id to \c std::string
-		 * 
-		 * @param _tid Thread ID
-		 * @return std::string Converted string
-		 */
-		static std::string ThreadToString(std::thread::id _tid)
-		{
-			auto ssThread = std::ostringstream();
-
-			ssThread << _tid;
-
-			return ssThread.str();
-		}
+		virtual void operator()();
 
 	protected:
 		std::deque<std::pair<const void*, std::uint32_t>> _data; ///< Queue of messages
