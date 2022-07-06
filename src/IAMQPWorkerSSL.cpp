@@ -1,8 +1,15 @@
 #include "IAMQPWorkerSSL.hpp"
+#include "IConnectionHandler.hpp"
 #include "IWorker.hpp"
+#include "SymbolMaps.hpp"
 
 #include <string>
 #include <cstdint>
+
+#include <amqpcpp.h>
+#include <json/json.h>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 agent::IAMQPWorkerSSL::IAMQPWorkerSSL(
     unsigned int _id,
@@ -77,7 +84,6 @@ agent::IAMQPWorkerSSL::IAMQPWorkerSSL(
         _logger->error("Anonymous exception caught");
     }
 }
-
 
 agent::IAMQPWorkerSSL::IAMQPWorkerSSL(
     unsigned int _id,
@@ -178,7 +184,7 @@ void agent::IAMQPWorkerSSL::SetConsumerCallbacks()
                 _channel.ack(tag);
             }
         ).onError(
-            [this](const char* message){
+            [this](const char* message) {
                 _logger->error("[onError] {}", message);
             }
         );

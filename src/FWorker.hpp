@@ -6,11 +6,11 @@
 #include <mutex>
 #include <vector>
 #include <deque>
-#include <functional>
 #include <cstdint>
+#include <memory>
+#include <functional>
 
 #include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace agent
 {
@@ -31,7 +31,7 @@ namespace agent
 		 * 
 		 * @param __id The ID number for this worker
 		 */
-		FWorker(unsigned int __id, std::function<int(const void*, std::uint32_t, void*, std::uint32_t*)> _msgproc);
+		FWorker(unsigned int __id, std::function<int(const void *, std::uint32_t, void *, std::uint32_t *)> _msgproc);
 
 		/**
 		 * @brief Construct a new IWorker object
@@ -39,7 +39,7 @@ namespace agent
 		 * @param __id Desired worker ID
 		 * @param __name Desired worker name
 		 */
-		FWorker(unsigned int __id, std::string __name, std::function<int(const void*, std::uint32_t, void*, std::uint32_t*)> _msgproc);
+		FWorker(unsigned int __id, std::string __name, std::function<int(const void *, std::uint32_t, void *, std::uint32_t *)> _msgproc);
 
 		/**
 		 * @brief Destroy the IWorker object
@@ -97,19 +97,19 @@ namespace agent
 		 */
 		void SetQuit();
 
-		void AddMessage(void* _msg, std::uint32_t _size);
+		void AddMessage(void * _msg, std::uint32_t _size);
 
 		/**
 		 * @brief Process the given (serialized) message
 		 * 
 		 * This is where the work is done in the worker class.
 		 * 
-		 * @param _msg Serialized message (array of bytes, i.e. void*)
+		 * @param _msg Serialized message (array of bytes, i.e. void *)
 		 * @param _size Number of bytes in the serialized message in \c _msg
 		 * @param _result Output result that can be used by the caller
 		 * @return int Unique ID of the message processed
 		 */
-		std::function<int(const void*, std::uint32_t, void*, std::uint32_t*)> ProcessMessage;
+		std::function<int(const void *, std::uint32_t, void *, std::uint32_t *)> ProcessMessage;
 
 		/**
 		 * @brief Contains the main work loop
@@ -120,16 +120,8 @@ namespace agent
 		 */
 		void operator()();
 
-		/**
-		 * @brief Converts a \c std::thread::id to \c std::string
-		 * 
-		 * @param _tid Thread ID
-		 * @return std::string Converted string
-		 */
-		static std::string ThreadToString(std::thread::id _tid);
-
 	protected:
-		std::deque<std::pair<void*, std::uint32_t>> _data; ///< Queue of messages
+		std::deque<std::pair<void *, std::uint32_t>> _data; ///< Queue of messages
 		std::mutex _data_lock; ///< Mutex lock for the \c _data queue
 		std::vector<std::thread> _threads; ///< All of the threads running on the worker
 		std::shared_ptr<spdlog::logger> _logger = nullptr;

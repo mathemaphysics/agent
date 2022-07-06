@@ -1,20 +1,18 @@
 #pragma once
 
-#include "Buffer.hpp"
-#include "IWorker.hpp"
 #include "IConnectionHandler.hpp"
+#include "IConnectionHandlerSSL.hpp"
 
 #include <amqpcpp.h>
+#include <spdlog/spdlog.h>
+#include <Poco/Net/Net.h>
 #include <Poco/Net/NetSSL.h>
 #include <Poco/Net/Context.h>
 #include <Poco/Net/SecureStreamSocket.h>
-#include <Poco/Net/SSLManager.h>
-#include <Poco/Net/AcceptCertificateHandler.h>
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 
-#include <vector>
+#include <string>
 #include <cstdint>
+#include <memory>
 
 class SSLInitializer
 {

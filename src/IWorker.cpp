@@ -1,5 +1,19 @@
 #include "IWorker.hpp"
 
+#include <string>
+#include <atomic>
+#include <thread>
+#include <mutex>
+#include <vector>
+#include <deque>
+#include <cstdint>
+#include <memory>
+#include <utility>
+#include <algorithm>
+#include <exception>
+
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 agent::IWorker::IWorker(unsigned int __id)
 {
@@ -102,7 +116,7 @@ void agent::IWorker::SetQuit()
     _state.store(WORKER_QUIT);
 }
 
-void agent::IWorker::AddMessage(const void* _msg, std::uint32_t _size)
+void agent::IWorker::AddMessage(const void *_msg, std::uint32_t _size)
 {
     _data_lock.lock();
     _data.push_front(std::pair<const void*, std::uint32_t>(_msg, _size));

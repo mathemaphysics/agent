@@ -1,6 +1,7 @@
 #include "IAMQPWorker.hpp"
 #include "IConnectionHandler.hpp"
 #include "IWorker.hpp"
+#include "SymbolMaps.hpp"
 
 #include <string>
 #include <cstdint>
@@ -8,6 +9,7 @@
 #include <amqpcpp.h>
 #include <json/json.h>
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 agent::IAMQPWorker::IAMQPWorker(
     unsigned int _id,

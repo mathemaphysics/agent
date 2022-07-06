@@ -1,18 +1,16 @@
 #pragma once
 
-#include <iostream>
 #include <string>
 #include <atomic>
 #include <thread>
 #include <mutex>
 #include <vector>
 #include <deque>
-#include <functional>
-#include <sstream>
 #include <cstdint>
+#include <memory>
+#include <utility>
 
 #include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace agent
 {

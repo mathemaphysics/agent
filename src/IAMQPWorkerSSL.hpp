@@ -2,16 +2,14 @@
 
 #include "IConnectionHandlerSSL.hpp"
 #include "IWorker.hpp"
+#include "SymbolMaps.hpp"
 
 #include <string>
 #include <cstdint>
-#include <algorithm>
 
 #include <amqpcpp.h>
 #include <json/json.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-
-#include "SymbolMaps.hpp"
+#include <spdlog/spdlog.h>
 
 namespace agent
 {

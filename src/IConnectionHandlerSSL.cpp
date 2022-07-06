@@ -1,17 +1,16 @@
 #include "agent/agent.hpp"
+#include "IConnectionHandler.hpp"
 #include "IConnectionHandlerSSL.hpp"
-#include "IWorker.hpp"
-
-#include <vector>
-#include <cstdint>
-#include <string>
-#include <sstream>
-#include <exception>
 
 #include <amqpcpp.h>
 #include <spdlog/spdlog.h>
-#include <Poco/Net/SecureStreamSocket.h>
+#include <Poco/Net/Net.h>
+#include <Poco/Net/NetSSL.h>
 #include <Poco/Net/Context.h>
+#include <Poco/Net/SecureStreamSocket.h>
+
+#include <cstdint>
+#include <string>
 
 agent::IConnectionHandlerSSL::IConnectionHandlerSSL(
     unsigned int _id,

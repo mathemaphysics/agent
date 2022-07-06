@@ -1,15 +1,15 @@
 #include "FWorker.hpp"
 
-#include <iostream>
 #include <string>
 #include <atomic>
 #include <thread>
 #include <mutex>
 #include <vector>
 #include <deque>
-#include <functional>
-#include <sstream>
 #include <cstdint>
+#include <memory>
+#include <functional>
+#include <exception>
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -163,13 +163,4 @@ void agent::FWorker::operator()()
             }
         }
     }
-}
-
-std::string agent::FWorker::ThreadToString(std::thread::id _tid)
-{
-    auto ssThread = std::ostringstream();
-
-    ssThread << _tid;
-
-    return ssThread.str();
 }
