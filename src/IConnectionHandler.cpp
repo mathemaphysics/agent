@@ -1,8 +1,8 @@
 #include "agent/agent.hpp"
 
-#include "IConnectionHandler.hpp"
-#include "Buffer.hpp"
-#include "IWorker.hpp"
+#include "agent/IConnectionHandler.hpp"
+#include "agent/Buffer.hpp"
+#include "agent/IWorker.hpp"
 
 #include <amqpcpp.h>
 #include <spdlog/spdlog.h>

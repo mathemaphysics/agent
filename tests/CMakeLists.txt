@@ -1,7 +1,7 @@
 add_executable(tests tests.cpp agent_t.cpp)
 target_compile_features(tests PRIVATE cxx_std_17)
 target_include_directories(tests PUBLIC ../src)
-target_link_libraries(tests PUBLIC agent GTest::gtest GTest::gtest_main spdlog::spdlog)
+target_link_libraries(tests PUBLIC GTest::gtest GTest::gtest_main spdlog::spdlog agent)
 
 #add_executable(SSLTestClient SSLTestClient.cpp)
 #target_link_libraries(SSLTestClient PUBLIC Poco::Net Poco::Crypto Poco::NetSSL ssl3 spdlog)

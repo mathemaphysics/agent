@@ -1,5 +1,5 @@
-#include "IConnectionHandlerSSL.hpp"
-#include "IConnectionHandler.hpp"
+#include "agent/IConnectionHandlerSSL.hpp"
+#include "agent/IConnectionHandler.hpp"
 
 #include <amqpcpp.h>
 #include <spdlog/spdlog.h>

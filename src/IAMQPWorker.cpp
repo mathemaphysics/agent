@@ -1,7 +1,7 @@
-#include "IAMQPWorker.hpp"
-#include "IConnectionHandler.hpp"
-#include "IWorker.hpp"
-#include "SymbolMaps.hpp"
+#include "agent/IAMQPWorker.hpp"
+#include "agent/IConnectionHandler.hpp"
+#include "agent/IWorker.hpp"
+#include "agent/SymbolMaps.hpp"
 
 #include <string>
 #include <cstdint>

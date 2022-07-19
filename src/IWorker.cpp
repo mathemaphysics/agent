@@ -1,4 +1,4 @@
-#include "IWorker.hpp"
+#include "agent/IWorker.hpp"
 
 #include <string>
 #include <atomic>
