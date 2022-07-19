@@ -1,9 +1,10 @@
 #include "agent/agent.hpp"
-#include "Worker.hpp"
-#include "IConnectionHandler.hpp"
-#include "IAMQPWorker.hpp"
-#include "IAMQPWorkerSSL.hpp"
-#include "FWorker.hpp"
+#include "agent/Worker.hpp"
+#include "agent/Buffer.hpp"
+#include "agent/IConnectionHandler.hpp"
+#include "agent/IAMQPWorker.hpp"
+#include "agent/IAMQPWorkerSSL.hpp"
+#include "agent/FWorker.hpp"
 #include "Message_generated.h"
 
 #include <thread>
@@ -355,12 +356,12 @@ protected:
 
 TEST_F(AMQPWorkerTest, CreateConnectionHandler)
 {
-  //std::this_thread::sleep_for(std::chrono::seconds(12000));
+  std::this_thread::sleep_for(std::chrono::seconds(12000));
 }
 
 TEST_F(AMQPWorkerTestSSL, CreateConnectionHandler)
 {
-  //std::this_thread::sleep_for(std::chrono::seconds(12000));
+  std::this_thread::sleep_for(std::chrono::seconds(12000));
 }
 
 TEST(add_one, sample)

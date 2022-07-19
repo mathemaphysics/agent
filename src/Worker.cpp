@@ -1,4 +1,4 @@
-#include "Worker.hpp"
+#include "agent/Worker.hpp"
 #include "Message_generated.h"
 
 #include <iostream>

@@ -4,12 +4,13 @@
 #include "IWorker.hpp"
 
 #include <amqpcpp.h>
-#include <Poco/Net/StreamSocket.h>
 #include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
+#include <Poco/Net/StreamSocket.h>
+#include <Poco/Net/SocketAddress.h>
 
 #include <vector>
 #include <cstdint>
+#include <memory>
 
 namespace agent
 {

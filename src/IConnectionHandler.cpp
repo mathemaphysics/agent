@@ -1,16 +1,18 @@
 #include "agent/agent.hpp"
-#include "IConnectionHandler.hpp"
-#include "IWorker.hpp"
 
-#include <vector>
-#include <cstdint>
-#include <string>
-#include <sstream>
-#include <exception>
+#include "agent/IConnectionHandler.hpp"
+#include "agent/Buffer.hpp"
+#include "agent/IWorker.hpp"
 
 #include <amqpcpp.h>
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 #include <Poco/Net/StreamSocket.h>
+#include <Poco/Net/SocketAddress.h>
+
+#include <cstdint>
+#include <string>
+#include <sstream>
 
 agent::IConnectionHandler::IConnectionHandler(unsigned int _id)
     : _client("IConnectionHandler"), // Default client name

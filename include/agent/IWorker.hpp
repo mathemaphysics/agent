@@ -6,21 +6,21 @@
 #include <mutex>
 #include <vector>
 #include <deque>
-#include <functional>
 #include <cstdint>
+#include <memory>
+#include <utility>
 
 #include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace agent
 {
 	typedef enum {
-		FWORKER_READY,
-		FWORKER_RUNNING,
-		FWORKER_QUIT
-	} FWorkerState;
+		WORKER_READY,
+		WORKER_RUNNING,
+		WORKER_QUIT
+	} WorkerState;
 
-	class FWorker
+	class IWorker
 	{
 	public:
 		/**
@@ -31,7 +31,7 @@ namespace agent
 		 * 
 		 * @param __id The ID number for this worker
 		 */
-		FWorker(unsigned int __id, std::function<int(const void*, std::uint32_t, void*, std::uint32_t*)> _msgproc);
+		IWorker(unsigned int __id);
 
 		/**
 		 * @brief Construct a new IWorker object
@@ -39,13 +39,13 @@ namespace agent
 		 * @param __id Desired worker ID
 		 * @param __name Desired worker name
 		 */
-		FWorker(unsigned int __id, std::string __name, std::function<int(const void*, std::uint32_t, void*, std::uint32_t*)> _msgproc);
+		IWorker(unsigned int __id, std::string __name);
 
 		/**
 		 * @brief Destroy the IWorker object
 		 * 
 		 */
-		~FWorker();
+		virtual ~IWorker();
 
 		/**
 		 * @brief Starts the worker thread itself
@@ -83,21 +83,21 @@ namespace agent
 		void SetName(std::string __name);
 
 		/**
-		 * @brief Gets the state of the worker, a \c FWorkerState
+		 * @brief Gets the state of the worker, a \c WorkerState
 		 * 
 		 * @return WorkerState State of the worker
 		 */
-		FWorkerState GetState() const;
+		WorkerState GetState() const;
 
 		/**
 		 * @brief Set the quit state
 		 * 
-		 * Sets the \c _state to \c FWORKER_QUIT to kill the thread.
+		 * Sets the \c _state to \c WORKER_QUIT to kill the thread.
 		 * 
 		 */
 		void SetQuit();
 
-		void AddMessage(void* _msg, std::uint32_t _size);
+		virtual void AddMessage(const void* _msg, std::uint32_t _size);
 
 		/**
 		 * @brief Process the given (serialized) message
@@ -106,10 +106,11 @@ namespace agent
 		 * 
 		 * @param _msg Serialized message (array of bytes, i.e. void*)
 		 * @param _size Number of bytes in the serialized message in \c _msg
-		 * @param _result Output result that can be used by the caller
+		 * @param _result Result data serving as a return from the procedure
+		 * @param _rsize Size of the result message (optional)
 		 * @return int Unique ID of the message processed
 		 */
-		std::function<int(const void*, std::uint32_t, void*, std::uint32_t*)> ProcessMessage;
+		virtual int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr) = 0;
 
 		/**
 		 * @brief Contains the main work loop
@@ -118,18 +119,10 @@ namespace agent
 		 * until \c _data is exhausted.
 		 * 
 		 */
-		void operator()();
-
-		/**
-		 * @brief Converts a \c std::thread::id to \c std::string
-		 * 
-		 * @param _tid Thread ID
-		 * @return std::string Converted string
-		 */
-		static std::string ThreadToString(std::thread::id _tid);
+		virtual void operator()();
 
 	protected:
-		std::deque<std::pair<void*, std::uint32_t>> _data; ///< Queue of messages
+		std::deque<std::pair<const void*, std::uint32_t>> _data; ///< Queue of messages
 		std::mutex _data_lock; ///< Mutex lock for the \c _data queue
 		std::vector<std::thread> _threads; ///< All of the threads running on the worker
 		std::shared_ptr<spdlog::logger> _logger = nullptr;
@@ -137,6 +130,6 @@ namespace agent
 	private:
 		unsigned int _id; ///< Unique ID of the worker
 		std::string _name = "IWorker"; ///< Name assigned to the worker
-		std::atomic<FWorkerState> _state; ///< State of the worker; 0 -> Ready
+		std::atomic<WorkerState> _state; ///< State of the worker; 0 -> Ready
 	};
 }

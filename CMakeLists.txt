@@ -96,7 +96,6 @@ endif()
 if(BUILD_PYTHON)
   # Add Python bindings
   add_subdirectory(ext/pybind11)
-  
   add_subdirectory(python)
 endif()
 
@@ -122,8 +121,6 @@ install(
   DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
-
-
 
 install(
   EXPORT agent-config

@@ -14,7 +14,7 @@ namespace agent
      * for use in configuration via \c client.json file; see example in \c
      * config directory in the source.
      */
-    std::map<std::string, AMQP::ExchangeType> exchangeTypeMap =
+    static std::map<std::string, AMQP::ExchangeType> exchangeTypeMap =
     {
         {"consistent_hash", AMQP::ExchangeType::consistent_hash},
         {"direct", AMQP::ExchangeType::direct},
@@ -29,7 +29,7 @@ namespace agent
      * Equivalent mappings from name to enumeration value but for the all bit
      * flags, which are used to configure a number of things.
      */
-    std::map<std::string, const int> allBitFlags =
+    static std::map<std::string, const int> allBitFlags =
     {
         {"durable", AMQP::durable},
         {"autodelete", AMQP::autodelete},
@@ -55,7 +55,7 @@ namespace agent
      * 
      * Flags used to specify settings for event loops.
      */
-    std::map<std::string, const int> eventLoopFlags =
+    static std::map<std::string, const int> eventLoopFlags =
     {
         {"readable", AMQP::readable},
         {"writable", AMQP::writable}
