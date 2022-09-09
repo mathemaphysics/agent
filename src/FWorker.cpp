@@ -3,6 +3,7 @@
 #include <string>
 #include <atomic>
 #include <thread>
+#include <chrono>
 #include <mutex>
 #include <vector>
 #include <deque>
@@ -162,5 +163,8 @@ void agent::FWorker::operator()()
                 _logger->critical(e.what());
             }
         }
+
+        // TODO: Make this delay configurable via JSON sometime
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }

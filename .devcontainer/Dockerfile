@@ -1,4 +1,4 @@
-FROM mathemaphysics/cmake-base:latest
+FROM mathemaphysics/cmake-base:3.22
 
 ARG DEVUSER devuser
 
