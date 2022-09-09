@@ -59,10 +59,7 @@
 	// "postCreateCommand": "gcc -v",
 
 	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
-	"remoteUser": "devuser",
-	"features": {
-		"git": "os-provided"
-	}
+	"remoteUser": "devuser"
 
 	//// Maps the .ssh/ folder from your ${HOME} into /home/devuser/.ssh
 	//"mounts": [
