@@ -23,7 +23,7 @@ RUN apt-get -y update \
 					       python3-numpy \
  && python3 -m pip install cookiecutter sphinx breathe sphinx_rtd_theme
 
-ENV DEVUSER=${DEVUSER}
+ENV DEVUSER=devuser
 RUN adduser --uid 1000 --disabled-password --gecos "" ${DEVUSER} \
     && echo "${DEVUSER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${DEVUSER}
 USER ${DEVUSER}

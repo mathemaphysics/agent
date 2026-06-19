@@ -36,15 +36,15 @@ namespace agent
 		/**
 		 * @brief Destroy the Connection Handler object
 		 * 
-		 * Not default because we need to shut off the \c AMQP::Connection close
-		 * the \c StreamSocket and delete the pointer to \c _connection
+		 * Not default because we need to shut off the @c AMQP::Connection close
+		 * the @c StreamSocket and delete the pointer to @c _connection
 		 */
 		~IConnectionHandler() = default;
 
 		/**
 		 * @brief Callback for the properties action from AMQP server
 		 * 
-		 * @param _connection The connection object, \c AMQP::Connection 
+		 * @param _connection The connection object, @c AMQP::Connection 
 		 * @param _server Server information table
 		 * @param _client Client information table
 		 */
@@ -53,7 +53,7 @@ namespace agent
 		/**
 		 * @brief Callback for negotiating the heartbeat interval
 		 * 
-		 * @param _connection The connection object, \c AMQP::Connection
+		 * @param _connection The connection object, @c AMQP::Connection
 		 * @param _interval Requested heartbeat interval
 		 * @return uint16_t Negotiated heartbeat interval
 		 */
@@ -62,7 +62,7 @@ namespace agent
 		/**
 		 * @brief Callback which acts to send data when present
 		 * 
-		 * @param _connection The connection object, \c AMQP::Connection
+		 * @param _connection The connection object, @c AMQP::Connection
 		 * @param _data Pointer to the bytes to send
 		 * @param _size Number of bytes to send
 		 */
@@ -71,14 +71,14 @@ namespace agent
 		/**
 		 * @brief Callback which handles case when heartbeat is received
 		 * 
-		 * @param _connection The connection object, \c AMQP::Connection
+		 * @param _connection The connection object, @c AMQP::Connection
 		 */
 		void onHeartbeat(AMQP::Connection* _connection) override;
 
 		/**
 		 * @brief Callback for error case
 		 * 
-		 * @param _connection The connection object, \c AMQP::Connection
+		 * @param _connection The connection object, @c AMQP::Connection
 		 * @param _message Error message
 		 */
 		void onError(AMQP::Connection* _connection, const char* _message) override;
@@ -86,14 +86,14 @@ namespace agent
 		/**
 		 * @brief Callback which fires when connection is ready
 		 * 
-		 * @param _connection The connection object, \c AMQP::Connection
+		 * @param _connection The connection object, @c AMQP::Connection
 		 */
 		void onReady(AMQP::Connection* _connection) override;
 
 		/**
 		 * @brief Callback for closure of the connection
 		 * 
-		 * @param _connection The connection object, \c AMQP::Connection
+		 * @param _connection The connection object, @c AMQP::Connection
 		 */
 		void onClosed(AMQP::Connection* _connection) override;
 
@@ -107,7 +107,7 @@ namespace agent
 		int ProcessMessage(const void* _msg, std::uint32_t _size, void* _result = nullptr, std::uint32_t* _rsize = nullptr);
 
 		/**
-		 * @brief Returns the underlying \c Poco::Net::StreamSocket
+		 * @brief Returns the underlying @c Poco::Net::StreamSocket
 		 * 
 		 * @return Poco::Net::StreamSocket& 
 		 */

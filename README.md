@@ -207,14 +207,27 @@ int main(int argc, char** argv)
 }
 ```
 
-At this point you're ready to build. If you're accustomed to CMake. You'll
-notice that the samples directory already contains a pre-built version of the
-`Worker` class you just wrote in this introduction. At this point `Worker` is a
-part of the basic unit tests which can be found in `tests/agent_t.cpp`. Making
-sure that `BUILD_TESTS=ON` is set during your build with CMake will ensure that
-it will be compiled into the `bin/tests` binary. We're in the process of
-rearranging the code. Eventually this will be placed into a samples or examples
-directory.
+At this point you're ready to build. Complete, runnable versions of the code
+shown above live in the [`examples/`](examples) directory:
+
+* [`examples/basic_worker.cpp`](examples/basic_worker.cpp) — the exact flow from
+  this introduction using the built-in `agent::Worker`.
+* [`examples/custom_worker.cpp`](examples/custom_worker.cpp) — deriving your own
+  worker from `agent::IWorker` and doing real work in `ProcessMessage`.
+* [`examples/functional_worker.cpp`](examples/functional_worker.cpp) — supplying
+  the processing logic as a lambda via `agent::FWorker` instead of subclassing.
+
+The examples are built automatically when `BUILD_EXAMPLES=ON` (the default). You
+can build them all with:
+
+```sh
+cmake --build . --target examples
+```
+
+and then run, for example, `./examples/basic_worker`. The `Worker` class is also
+exercised by the basic unit tests in `tests/agent_t.cpp`; setting
+`BUILD_TESTING=ON` during your CMake build compiles it into the `bin/tests`
+binary.
 
 # Prerequisites
 
@@ -243,6 +256,7 @@ which can be set by adding `-D<var>={ON, OFF}` to the `cmake` call:
 * `BUILD_TESTING`: Enable building of the test suite (default: `ON`)
 * `BUILD_DOCS`: Enable building the documentation (default: `ON`)
 * `BUILD_PYTHON`: Enable building the Python bindings (default: `ON`)
+* `BUILD_EXAMPLES`: Enable building of the examples (default: `ON`)
 
 # Documentation
 

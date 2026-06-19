@@ -53,8 +53,8 @@ namespace agent
 		/**
 		 * @brief Destroy the Connection Handler object
 		 * 
-		 * Not default because we need to shut off the \c AMQP::Connection close
-		 * the \c StreamSocket and delete the pointer to \c _connection
+		 * Not default because we need to shut off the @c AMQP::Connection close
+		 * the @c StreamSocket and delete the pointer to @c _connection
 		 */
 		~IConnectionHandlerSSL() = default;
 

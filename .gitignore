@@ -172,6 +172,7 @@ cython_debug/
 
 # Build directories
 build/**
+build-examples/**
 install/**
 
 # Flatbuffers generated files

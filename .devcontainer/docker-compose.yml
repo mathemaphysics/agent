@@ -5,14 +5,14 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        DEVUSER: ${DEVUSER}
+        DEVUSER: devuser
     depends_on:
       - broker
     networks:
       - agent_network
     volumes:
-      - ${REPOSDIR}/agent:${WORKSPACEDIR}/agent
-      - build_volume:${WORKSPACEDIR}/agent/build
+      - ..:/workspaces/agent
+      - build_volume:/workspaces/agent/build
       - ${HOME}/.ssh:/home/${DEVUSER}/.ssh
       - ${HOME}/certs:/workspaces/certs
     command: ["sleep", "infinity"]
@@ -23,7 +23,7 @@ services:
       - "15672:15672"
       - "15671:15671"
     volumes:
-      - ${HOME}/certs:/etc/rabbitmq/certs
+      - C:/Users/ryanp/certs:/etc/rabbitmq/certs
     networks:
       - agent_network
     entrypoint: /usr/local/bin/docker-entrypoint.sh
@@ -34,4 +34,3 @@ networks:
 
 volumes:
   build_volume:
-

@@ -15,6 +15,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Compilation options
 set(BUILD_PYTHON ON CACHE BOOL "Enable building of Python bindings")
 set(BUILD_DOCS ON CACHE BOOL "Enable building of documentation")
+set(BUILD_EXAMPLES ON CACHE BOOL "Enable building of examples")
 
 set(AGENT_FB_BUFFER_SIZE "1024")
 set(AGENT_CONN_BUFFER_SIZE "8*1024*1024")
@@ -82,6 +83,11 @@ add_subdirectory(src)
 
 # compile the application
 add_subdirectory(app)
+
+# compile the examples
+if(BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif()
 
 # compile the tests
 include(CTest)

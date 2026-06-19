@@ -10,8 +10,8 @@ namespace agent
     /**
      * @brief Exchange type enum
      * 
-     * Mapping the names of each enum value to its \c AMQP::ExchangeType value
-     * for use in configuration via \c client.json file; see example in \c
+     * Mapping the names of each enum value to its @c AMQP::ExchangeType value
+     * for use in configuration via @c client.json file; see example in @c
      * config directory in the source.
      */
     static std::map<std::string, AMQP::ExchangeType> exchangeTypeMap =

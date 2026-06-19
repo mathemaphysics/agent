@@ -87,8 +87,8 @@ namespace agent
 		void SetConsumerCallbacks();
 
 		/**
-		 * @brief Overridden version of \c AddMessage from \c IWorker which,
-		 * instead of adding to the local \c std::deque of message, adds the
+		 * @brief Overridden version of @c AddMessage from @c IWorker which,
+		 * instead of adding to the local @c std::deque of message, adds the
 		 * message to the AMQP queue
 		 * 
 		 * @param _msg  Pointer to the message itself
@@ -102,7 +102,7 @@ namespace agent
 		 * The worker can be run with any number of threads, the idea being that
 		 * if you set the AMQP prefetch within QOS settings to something greater
 		 * than one you should be able to pull in multiple messages at once
-		 * which can then be processed using your \c IWorker .
+		 * which can then be processed using your @c IWorker .
 		 */
 		IWorker *_worker; ///< Pointer to an IWorker that knows how to process a single message
 
@@ -115,8 +115,8 @@ namespace agent
 		/**
 		 * @brief Connection variable _created_ here
 		 * 
-		 * The reason we need another \c _connection comes from the fact that
-		 * the parent class \c ConnectionHandler merely passes around a pointer
+		 * The reason we need another @c _connection comes from the fact that
+		 * the parent class @c ConnectionHandler merely passes around a pointer
 		 * to the connection handler we create here; it doesn't actually make
 		 * one, only takes what you give it
 		 */

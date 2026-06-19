@@ -26,15 +26,15 @@ namespace agent
 		/**
 		 * @brief Construct a new Worker object
 		 * 
-		 * @param _id ID to assign to this \c Worker
+		 * @param _id ID to assign to this @c Worker
 		 */
 		Worker(unsigned int _id);
 
 		/**
 		 * @brief Construct a new Worker object
 		 * 
-		 * @param _id ID to assign to this \c Worker
-		 * @param _name Name to assign the \c Worker
+		 * @param _id ID to assign to this @c Worker
+		 * @param _name Name to assign the @c Worker
 		 */
 		Worker(unsigned int _id, std::string _name);
 		~Worker();
@@ -42,7 +42,7 @@ namespace agent
 		/**
 		 * @brief The function which does the work on each message
 		 * 
-		 * This is the function which does the job of the \c Worker.
+		 * This is the function which does the job of the @c Worker.
 		 * Without this function you just have a fancy constructor
 		 * that spawns a thread or a few.
 		 * 

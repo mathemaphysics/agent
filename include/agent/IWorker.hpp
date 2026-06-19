@@ -50,7 +50,7 @@ namespace agent
 		/**
 		 * @brief Starts the worker thread itself
 		 * 
-		 * This function exists for the case that you might want to inherit \c
+		 * This function exists for the case that you might want to inherit @c
 		 * IWorker and do more setup of the object before starting the thread
 		 */
 		void Run(std::size_t _nthread = 1);
@@ -83,7 +83,7 @@ namespace agent
 		void SetName(std::string __name);
 
 		/**
-		 * @brief Gets the state of the worker, a \c WorkerState
+		 * @brief Gets the state of the worker, a @c WorkerState
 		 * 
 		 * @return WorkerState State of the worker
 		 */
@@ -92,7 +92,7 @@ namespace agent
 		/**
 		 * @brief Set the quit state
 		 * 
-		 * Sets the \c _state to \c WORKER_QUIT to kill the thread.
+		 * Sets the @c _state to @c WORKER_QUIT to kill the thread.
 		 * 
 		 */
 		void SetQuit();
@@ -105,7 +105,7 @@ namespace agent
 		 * This is where the work is done in the worker class.
 		 * 
 		 * @param _msg Serialized message (array of bytes, i.e. void*)
-		 * @param _size Number of bytes in the serialized message in \c _msg
+		 * @param _size Number of bytes in the serialized message in @c _msg
 		 * @param _result Result data serving as a return from the procedure
 		 * @param _rsize Size of the result message (optional)
 		 * @return int Unique ID of the message processed
@@ -115,15 +115,15 @@ namespace agent
 		/**
 		 * @brief Contains the main work loop
 		 * 
-		 * Contains the main work loop in which \c ProcessMessage is called
-		 * until \c _data is exhausted.
+		 * Contains the main work loop in which @c ProcessMessage is called
+		 * until @c _data is exhausted.
 		 * 
 		 */
 		virtual void operator()();
 
 	protected:
 		std::deque<std::pair<const void*, std::uint32_t>> _data; ///< Queue of messages
-		std::mutex _data_lock; ///< Mutex lock for the \c _data queue
+		std::mutex _data_lock; ///< Mutex lock for the @c _data queue
 		std::vector<std::thread> _threads; ///< All of the threads running on the worker
 		std::shared_ptr<spdlog::logger> _logger = nullptr;
 
