@@ -175,5 +175,8 @@ build/**
 build-examples/**
 install/**
 
+# Extensions directory
+ext/**
+
 # Flatbuffers generated files
 *_generated.*

@@ -47,6 +47,7 @@
                 "JSONCPP_WITH_PKGCONFIG_SUPPORT": "FALSE",
                 "FETCHCONTENT_QUIET": "FALSE",
                 "GIT_PROGRESS": "TRUE",
+                "BUILD_PYTHON": "FALSE",
                 "BUILD_TESTING": "TRUE"
             }
         },
@@ -92,6 +93,7 @@
                 "JSONCPP_WITH_PKGCONFIG_SUPPORT": "FALSE",
                 "FETCHCONTENT_QUIET": "FALSE",
                 "GIT_PROGRESS": "TRUE",
+                "BUILD_PYTHON": "FALSE",
                 "BUILD_TESTING": "TRUE"
             }
         },
@@ -138,6 +140,7 @@
                 "JSONCPP_WITH_PKGCONFIG_SUPPORT": "FALSE",
                 "FETCHCONTENT_QUIET": "FALSE",
                 "GIT_PROGRESS": "TRUE",
+                "BUILD_PYTHON": "FALSE",
                 "BUILD_TESTING": "TRUE"
             }
         }
