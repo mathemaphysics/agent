@@ -13,8 +13,8 @@ services:
     volumes:
       - ..:/workspaces/agent
       - build_volume:/workspaces/agent/build
-      - ${HOME}/.ssh:/home/${DEVUSER}/.ssh
-      - ${HOME}/certs:/workspaces/certs
+      - C:/Users/ryanp/.ssh:/home/${DEVUSER}/.ssh
+      - C:/Users/ryanp/certs:/workspaces/certs
     command: ["sleep", "infinity"]
 
   broker:

@@ -1,8 +1,8 @@
 {
-    "version": 3,
+    "version": 6,
     "cmakeMinimumRequired": {
         "major": 3,
-        "minor": 16,
+        "minor": 25,
         "patch": 0
     },
     "configurePresets": [
@@ -198,6 +198,62 @@
                 "noTestsAction": "error",
                 "stopOnFailure": true
             }
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "agent-makefiles-workflow",
+            "displayName": "Unix Makefiles Workflow",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "agent-makefiles-configure"
+                },
+                {
+                    "type": "build",
+                    "name": "agent-makefiles-build"
+                },
+                {
+                    "type": "test",
+                    "name": "agent-makefiles-test"
+                }
+            ]
+        },
+        {
+            "name": "agent-makefiles-workflow-debug",
+            "displayName": "Unix Makefiles Workflow (Debug)",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "agent-makefiles-configure-debug"
+                },
+                {
+                    "type": "build",
+                    "name": "agent-makefiles-build-debug"
+                },
+                {
+                    "type": "test",
+                    "name": "agent-makefiles-test-debug"
+                }
+            ]
+        },
+        {
+            "name": "agent-makefiles-workflow-debug-cov",
+            "displayName": "Unix Makefiles Workflow (Debug+Coverage)",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "agent-makefiles-configure-debug-cov"
+                },
+                {
+                    "type": "build",
+                    "name": "agent-makefiles-build-debug-cov"
+                },
+                {
+                    "type": "test",
+                    "name": "agent-makefiles-test-debug-cov"
+                }
+            ]
         }
     ]
 }
