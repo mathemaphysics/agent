@@ -290,7 +290,11 @@ protected:
     spdlog::set_level(spdlog::level::debug);
     amqpProc = new AMQPProcessor(100, "AMQPProcessor");
     amqpProc->Run(1);
-    //amqpWorker = new IAMQPWorker(1, amqpProc, "broker", 5672, "guest", "guest", "/", "AMQPWorker", "AnotherQueue", "Exchange", "AnotherQueue", AMQP::autodelete, AMQP::autodelete, 4, AMQP::ExchangeType::direct, "TestCode", "0.0.1", "Copyright 2022 Mathemaphysics Inc", "https://github.org/mathemaphysics/agent.git");
+    //amqpWorker = new IAMQPWorker(1, amqpProc, "broker", 5672, "guest",
+    //"guest", "/", "AMQPWorker", "AnotherQueue", "Exchange", "AnotherQueue",
+    //AMQP::autodelete, AMQP::autodelete, 4, AMQP::ExchangeType::direct,
+    //"TestCode", "0.0.1", "Copyright 2022 Mathemaphysics Inc",
+    //"https://github.org/mathemaphysics/agent.git");
 
     try
     {
@@ -362,12 +366,17 @@ protected:
 
 TEST_F(AMQPWorkerTest, DISABLED_CreateConnectionHandler)
 {
-  std::this_thread::sleep_for(std::chrono::seconds(12000));
+  std::this_thread::sleep_for(std::chrono::seconds(10));
 }
 
 TEST_F(AMQPWorkerTestSSL, CreateConnectionHandler)
 {
-  std::this_thread::sleep_for(std::chrono::seconds(12000));
+  std::this_thread::sleep_for(std::chrono::seconds(10));
+  EXPECT_EQ(amqpProc->ResultsAvailable(), 2);
+  std::pair<int, bool> result1{0, false};
+  auto index1 = amqpProc->PopResult(result1);
+  std::pair<int, bool> result2{0, false};
+  auto index2 = amqpProc->PopResult(result2);
 }
 
 /**

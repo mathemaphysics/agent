@@ -124,6 +124,31 @@ void agent::IWorker::AddMessage(const void *_msg, std::uint32_t _size)
     _data_lock.unlock();
 }
 
+bool agent::IWorker::PopResult(std::pair<int, bool> &_result)
+{
+    bool popped = false;
+
+    _results_lock.lock();
+    if (!_results.empty())
+    {
+        _result = _results.back();
+        _results.pop_back();
+        popped = true;
+    }
+    _results_lock.unlock();
+
+    return popped;
+}
+
+std::size_t agent::IWorker::ResultsAvailable()
+{
+    _results_lock.lock();
+    std::size_t count = _results.size();
+    _results_lock.unlock();
+
+    return count;
+}
+
 void agent::IWorker::operator()()
 {
     while (GetState() != WORKER_QUIT)
@@ -148,15 +173,24 @@ void agent::IWorker::operator()()
             // Now process it
             const auto message = curmsg.first;
             const auto size = curmsg.second;
+            int msgId = -1;
+            bool success = false;
             try
             {
-                int msgId = ProcessMessage(message, size);
+                msgId = ProcessMessage(message, size);
+                success = true;
                 _logger->info("Successfully processed message {}", msgId);
             }
             catch(const std::exception& e)
             {
                 _logger->critical(e.what());
             }
+
+            // Record the outcome on the return value stack
+            _results_lock.lock();
+            _results.push_front(std::pair<int, bool>(msgId, success));
+            _results_lock.unlock();
+            _logger->debug(std::string("Message processed result: ") + std::to_string(msgId) + " -> " + std::to_string(success));
         }
 
         // TODO: Make this delay configurable via JSON sometime

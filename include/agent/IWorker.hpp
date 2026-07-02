@@ -100,6 +100,27 @@ namespace agent
 		virtual void AddMessage(const void* _msg, std::uint32_t _size);
 
 		/**
+		 * @brief Pops the oldest available result off the return value stack
+		 *
+		 * Retrieves the result of a processed message recorded by the work
+		 * loop. Each entry pairs the unique ID returned by @c ProcessMessage
+		 * with a boolean indicating whether the message was processed
+		 * successfully (i.e. without throwing an exception).
+		 *
+		 * @param _result Output pair holding the message ID and its success flag
+		 * @return true If a result was available and written to @c _result
+		 * @return false If the return value stack was empty
+		 */
+		bool PopResult(std::pair<int, bool>& _result);
+
+		/**
+		 * @brief Returns the number of pending results on the return value stack
+		 *
+		 * @return std::size_t Count of results not yet popped
+		 */
+		std::size_t ResultsAvailable();
+
+		/**
 		 * @brief Process the given (serialized) message
 		 * 
 		 * This is where the work is done in the worker class.
@@ -124,6 +145,8 @@ namespace agent
 	protected:
 		std::deque<std::pair<const void*, std::uint32_t>> _data; ///< Queue of messages
 		std::mutex _data_lock; ///< Mutex lock for the @c _data queue
+		std::deque<std::pair<int, bool>> _results; ///< Stack of processed message results (ID, success)
+		std::mutex _results_lock; ///< Mutex lock for the @c _results stack
 		std::vector<std::thread> _threads; ///< All of the threads running on the worker
 		std::shared_ptr<spdlog::logger> _logger = nullptr;
 
